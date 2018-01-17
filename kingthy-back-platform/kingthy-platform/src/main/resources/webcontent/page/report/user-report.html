@@ -1,0 +1,366 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta http-equiv="Cache-Control" content="no-siteapp" />
+	<!--[if lt IE 9]>
+<script type="text/javascript" src="lib/html5shiv.js"></script>
+<script type="text/javascript" src="lib/respond.min.js"></script>
+<![endif]-->
+	<link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/plugins/sweetalert/sweetalert.css">
+	<!--[if IE 6]>
+<script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script>
+<![endif]-->
+	<title>用户数据</title>
+	<style type="text/css">
+		.echarts_box {
+			height: 520px;
+		}
+		.echart-wrap {
+			border: 1px solid #ddd;
+			height: 550px;
+			margin: 10px 0;
+		}
+		.echart-wrap center {
+			height: 30px;
+			line-height: 30px;
+		}
+		.mb20 {
+			margin-bottom: 20px;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div class="container-fluid">
+		<!--用户数据-->
+		<div class="row" id="vm-user-data">
+
+			<div class="col-xs-12">
+				<table class="table  table-bordered table-condensed table-bg ">
+					<tr>
+						<div class="col-xs-3">
+							<h4 style="margin-top:20px; margin-left:-15px">用户数据（更新时间：{{updateTime}}）</h4>
+						</div>
+						<div class="col-xs-9">
+							<ul class="nav navbar-nav navbar-right">
+								<li><a href="#" v-on:click="getReportData('yesterday')">昨天</a></li>
+								<li><a href="#" v-on:click="getReportData('lastWeek')">过去一周</a></li>
+								<li><a href="#" v-on:click="getReportData('lastHalfMonth')">过去15天</a></li>
+								<li><a href="#" v-on:click="getReportData('lastMonth')">过去一个月</a></li>
+							</ul>
+						</div>
+					</tr>
+					<tr>
+						<td>
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									全站日均PV
+								</div>
+								<div class="panel-body">
+									{{site_pv}}
+								</div>
+							</div>
+						</td>
+						<td>
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									全站日均UV
+								</div>
+								<div class="panel-body">
+									{{site_uv}}
+								</div>
+							</div>
+						</td>
+						<td>
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									全站注册用户
+								</div>
+								<div class="panel-body">
+									{{registerUserCount}}
+								</div>
+							</div>
+						</td>
+						<td>
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									全站登录用户
+								</div>
+								<div class="panel-body">
+									{{login_users}}
+								</div>
+							</div>
+						</td>
+						<td>
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									全站试穿用户
+								</div>
+								<div class="panel-body">
+									{{tryon_users}}
+								</div>
+							</div>
+						</td>
+						<td>
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									全站下单用户
+								</div>
+								<div class="panel-body">
+									{{orderUserCount}}
+								</div>
+							</div>
+						</td>
+						<td>
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									全站购买用户
+								</div>
+								<div class="panel-body">
+									{{buyerCount}}
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<!--留存率-->
+		<div class="row">
+			<div>
+				<h4 style="margin-left:15px">留存率</h4>
+			</div>
+			<div class="col-xs-12">
+				<table id="tablelist" class="table table-border table-bordered table-hover table-bg">
+					<thead>
+						<tr class="text-c">
+							<th data-formatter="indexFormatter" data-width="50px">序号</th>
+							<th data-field="id" data-visible="false">id</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">访问日期</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">新增用户</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">1日留存</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">2日留存</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">3日留存</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">4日留存</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">5日留存</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">6日留存</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">7日留存</th>
+							<th data-field="className" data-halign="left" data-valign="middle" data-align="left">15日留存</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+		<!--图表-->
+		<div class="row mb20">
+			<!--网站转化效果-->
+			<div class="col-xs-6">
+				<div class="echart-wrap" id="vm_site-take-rates">
+					<div id="site-take-rates" class="echarts_box"></div>
+					<center>更新时间：2017-05-25</center>
+				</div>
+			</div>
+			<!--过去一周每日用户注册数-->
+			<div class="col-xs-6">
+				<div class="echart-wrap" id="vm_user_gister">
+					<div id="user-register" class="echarts_box"></div>
+					<center>更新时间：{{updateTime}}</center>
+				</div>
+			</div>
+		</div>
+		<div class="row mb20">
+			<!--过去一周每日活跃用户数-->
+			<div class="col-xs-6">
+				<div class="echart-wrap" id="vm_day-active-users">
+					<div id="day-active-users" class="echarts_box"></div>
+					<center>更新时间：2017-05-25</center>
+				</div>
+			</div>
+			<!--过去一周每日详情页PV / UV情况-->
+			<div class="col-xs-6">
+				<div class="echart-wrap" id="vm_detail-pv-uv">
+					<div id="detail-pv-uv" class="echarts_box"></div>
+					<center>更新时间：2017-05-25</center>
+				</div>
+			</div>
+		</div>
+		<div class="row mb20">
+			<!--过去一周每日全站PV/UV-->
+			<div class="col-xs-6">
+				<div class="echart-wrap">
+					<div id="site-pv-uv" class="echarts_box"></div>
+					<center>更新时间：2017-05-25</center>
+				</div>
+			</div>
+			<!--过去一周用户平均访问增长-->
+			<div class="col-xs-6">
+				<div class="echart-wrap">
+					<div id="user-visit-timespan" class="echarts_box"></div>
+					<center>更新时间：2017-05-25</center>
+				</div>
+			</div>
+		</div>
+		<div class="row mb20">
+			<!--过去一周多次登录用户数量-->
+			<div class="col-xs-6">
+				<div class="echart-wrap">
+					<div id="user-many-login" class="echarts_box"></div>
+					<center>更新时间：2017-05-25</center>
+				</div>
+			</div>
+			<!--过去一周用户登录频次分布-->
+			<div class="col-xs-6">
+				<div class="echart-wrap">
+					<div id="user-login-frequency" class="echarts_box"></div>
+					<center>更新时间：2017-05-25</center>
+				</div>
+			</div>
+		</div>
+		<div class="row mb20">
+			<!--网站平均重复购买率-->
+			<div class="col-xs-6">
+				<div class="echart-wrap" id="vm-repeat-buy-rate">
+					<div id="repeat-buy-rate" class="echarts_box"></div>
+					<center>更新时间：{{updateTime}}</center>
+				</div>
+			</div>
+			<!--不同年龄分段购买情况-->
+			<div class="col-xs-6 ">
+				<div class="echart-wrap" id="vm-different-age-buy">
+					<div id="different-age-buy" class="echarts_box"></div>
+					<center>更新时间：{{updateTime}}</center>
+				</div>
+			</div>
+		</div>
+		<div id="vm-active-users-distribution" class="row" style="margin-right:15px;">
+			<!--过去一周活跃用户分布-->
+			<!-- style="height:600px; margin-top:20px ;margin-left: 15px; margin-right: 15px;  border: solid 1px #ddd;"-->
+			<div class="col-xs-12" style="margin-top:20px ;margin-left: 15px; border: solid 1px #ddd;">
+				<div class="col-xs-6">
+					<div id="active-users-distribution" style="height:600px;"></div>
+					<div class="text-center">
+						<h5>更新时间：{{updateTime}}</h5>
+					</div>
+				</div>
+				<div class="col-xs-6">
+					<div class="col-xs-3">
+						<table class="table table-hover" style="margin-top:50px;margin-left:50px">
+							<thead>
+								<tr>
+									<td>地域</td>
+									<td>支付买家数</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="item in table1">
+									<td>{{item.name}}</td>
+									<td>{{item.value}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="col-xs-3" v-if="table2.length>0">
+						<table class="table table-hover" style="margin-top:50px;margin-left:50px">
+							<thead>
+								<tr>
+									<td>地域</td>
+									<td>支付买家数</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="item in table2">
+									<td>{{item.name}}</td>
+									<td>{{item.value}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="vm-buyer-distribution" class="row" style="margin-right:15px;">
+			<!--过去一周买家用户分布-->
+			<!-- style="height:600px; margin-top:20px ;margin-left: 15px; margin-right: 15px;  border: solid 1px #ddd;"-->
+			<div class="col-xs-12" style="margin-top:20px ;margin-left: 15px; border: solid 1px #ddd;">
+				<div class="col-xs-6">
+					<div id="buyer-distribution" style="height:600px;"></div>
+					<div class="text-center">
+						<h5>更新时间：{{updateTime}}</h5>
+					</div>
+				</div>
+				<div class="col-xs-6">
+					<div class="col-xs-3">
+						<table class="table table-hover" style="margin-top:50px;margin-left:50px">
+							<thead>
+								<tr>
+									<td>地域</td>
+									<td>支付买家数</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="item in table1">
+									<td>{{item.name}}</td>
+									<td>{{item.value}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="col-xs-3" v-if="table2.length>0">
+						<table class="table table-hover" style="margin-top:50px;margin-left:50px">
+							<thead>
+								<tr>
+									<td>地域</td>
+									<td>支付买家数</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="item in table2">
+									<td>{{item.name}}</td>
+									<td>{{item.value}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!---->
+			</div>
+		</div>
+	</div>
+
+
+
+	<script type="text/javascript" src="../../js/jquery.min.js?v=2.1.4"></script>
+	<script type="text/javascript" src="../../js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../plugins/sweetalert/sweetalert.min.js"></script>
+	<script type="text/javascript" src="../../js/common.js"></script>
+	<script type="text/javascript" src="../../js/vue.min.js"></script>
+	<script type="text/javascript" src="../../js/axios.min.js"></script>
+	<script type="text/javascript" src="../../js/axios-config.js"></script>
+	<script type="text/javascript" src="../../plugins/echarts/echarts-all.min.js"></script>
+	<script type="text/javascript" src="../../plugins/echarts/china.js"></script>
+	<script type="text/javascript" src="../../plugins/echarts/local-area.js"></script>
+	<script type="text/javascript" src="../../js/report/user/user-data.js"></script>
+	<script type="text/javascript" src="../../js/report/user/user-register.js"></script>
+	<script type="text/javascript" src="../../js/report/user/site-take-rates.js"></script>
+	<script type="text/javascript" src="../../js/report/user/day-active-users.js"></script>
+	<script type="text/javascript" src="../../js/report/user/detail-pv-uv.js"></script>
+	<script type="text/javascript" src="../../js/report/user/site-pv-uv.js"></script>
+	<script type="text/javascript" src="../../js/report/user/user-visit-timespan.js"></script>
+	<script type="text/javascript" src="../../js/report/user/user-many-login.js"></script>
+	<script type="text/javascript" src="../../js/report/user/user-login-frequency.js"></script>
+	<script type="text/javascript" src="../../js/report/user/repeat-buy-rate.js"></script>
+	<script type="text/javascript" src="../../js/report/user/different-age-buy.js"></script>
+	<script type="text/javascript" src="../../js/report/user/active-users-distribution.js"></script>
+	<script type="text/javascript" src="../../js/report/user/buyer-distribution.js"></script>
+
+</body>
+
+</html>

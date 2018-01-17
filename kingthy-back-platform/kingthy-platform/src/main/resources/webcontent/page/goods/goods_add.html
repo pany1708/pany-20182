@@ -1,0 +1,616 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="Bookmark" href="../../favicon.ico">
+    <link rel="Shortcut Icon" href="../../favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../../css/h-ui/css/H-ui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/plugins/sweetalert/sweetalert.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../plugins/summernote-master/dist/summernote.css"/>
+    <style type="text/css">
+        .fileUploadDiv {
+            position: relative;
+            overflow: hidden;
+            float: left !important;
+        }
+    </style>
+    <title>添加商品</title>
+</head>
+<body>
+<form class="page-container" id="myform">
+    <label class="form form-horizontal" id="app">
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2">商品分类：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <select class="select-box" v-model="model.goodsCategoryType" name="goodsCategoryType" required>
+                    <option :value="1">上衣</option>
+                    <option :value="2">裤装</option>
+                    <option :value="3">裙装</option>
+                    <option :value="4">套装</option>
+                </select>
+            </div>
+            <label class="form-label col-xs-2 col-sm-2">设计师：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                真玫自营
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2">商品名称：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="model.goodsName" name="goodsName" required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2">添加商品模型素材：</label>
+            <label class="form-label col-xs-2 col-sm-2">
+                <div style="width: 70px" v-show="file">
+                    <button class="btn-link glyphicon glyphicon-remove" @click="removeFile" type="button"
+                            style="color: red;text-decoration: none;float: right"></button>
+                    <button class="btn-link glyphicon glyphicon-cloud-download" @click="downloadFile" type="button"
+                            style="font-size: 50px;text-decoration: none;margin-top: -10px;float: left"></button>
+                </div>
+                <div class="fileUploadDiv" v-show="!file">
+                    <input type="file" class="input-file" @change="uploadFile" id="fileUrl">
+                    <a class="btn btn-upload">选择添加</a>
+                </div>
+            </label>
+        </div>
+        <div class="row cl">
+            <label class="form-label  col-xs-6 col-sm-6"><strong>商品属性</strong>&nbsp;&nbsp;
+                （错误填写商品属性，可能会引起商品下架或者搜索流量减小，影响正常销售，请认准准确填写）</label>
+        </div>
+        <div style="background-color:#eeeeee">
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2">所属风格：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+                <label class="form-label col-xs-2 col-sm-2">衣门襟：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2">适合年龄：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+                <label class="form-label col-xs-2 col-sm-2">裙型：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2">轮廓：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+                <label class="form-label col-xs-2 col-sm-2">袖长：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2">裙长：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+                <label class="form-label col-xs-2 col-sm-2">袖型：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2">款式：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+                <label class="form-label col-xs-2 col-sm-2">领型：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2">腰型：</label>
+                <div class="formControls col-xs-3 col-sm-2">
+                    <select class="select-box">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label  col-xs-3 col-sm-3"><strong>商品主图</strong>&nbsp;&nbsp;（宝贝主图不能超过3M）</label>
+        </div>
+        <div class="row cl">
+            <div style="padding-left: 200px">
+                <div class="col-xs-3 col-sm-3" style="width: 200px;height: 200px;border: 1px solid silver;">
+                    <div class="fileUploadDiv" style="padding:35px 0 0 60px" v-show="!img0.opusImage">
+                        <input type="file" class="input-file" @change="uploadFile0" id="file0">
+                        <a class="btn-link" style="font-size: 72px;color: silver">+</a>
+                    </div>
+                    <div v-show="img0.opusImage">
+                        <img :src="img0.opusImage" height="170px" width="170px">
+                    </div>
+                    <div style="position: relative;height: 25px;width: 200px;font-size: 25px;float: left"
+                         v-show="img0.opusImage">
+                        <a class="glyphicon glyphicon-chevron-left"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-chevron-right" @click="rightImg0"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-remove" @click="removeImg0"
+                           style="color: red;padding-left: 10px;text-decoration: none"></a>
+                    </div>
+                </div>
+                <div class="col-xs-1 col-sm-1" style="width: 1px"></div>
+                <div class="col-xs-3 col-sm-3" style="width: 200px;height: 200px;border: 1px solid silver;">
+                    <div class="fileUploadDiv" style="padding:35px 0 0 60px" v-show="!img1.opusImage">
+                        <input type="file" class="input-file" @change="uploadFile1" id="file1">
+                        <a class="btn-link" style="font-size: 72px;color: silver">+</a>
+                    </div>
+                    <div v-show="img1.opusImage">
+                        <img :src="img1.opusImage" height="170px" width="170px">
+                    </div>
+                    <div style="position: relative;height: 25px;width: 200px;font-size: 25px;float: left"
+                         v-show="img1.opusImage">
+                        <a class="glyphicon glyphicon-chevron-left" @click="leftImg1"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-chevron-right" @click="rightImg1"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-remove" @click="removeImg1"
+                           style="color: red;padding-left: 10px;text-decoration: none"></a>
+                    </div>
+                </div>
+                <div class="col-xs-1 col-sm-1" style="width: 1px"></div>
+                <div class="col-xs-3 col-sm-3" style="border: 1px solid silver;width: 200px;height: 200px">
+                    <div class="fileUploadDiv" style="padding:35px 0 0 60px" v-show="!img2.opusImage">
+                        <input type="file" class="input-file" @change="uploadFile2" id="file2">
+                        <a class="btn-link" style="font-size: 72px;color: silver">+</a>
+                    </div>
+                    <div v-show="img2.opusImage">
+                        <img :src="img2.opusImage" height="170px" width="170px">
+                    </div>
+                    <div style="position: relative;height: 25px;width: 200px;font-size: 25px;float: left"
+                         v-show="img2.opusImage">
+                        <a class="glyphicon glyphicon-chevron-left" @click="leftImg2"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-chevron-right" @click="rightImg2"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-remove" @click="removeImg2"
+                           style="color: red;padding-left: 10px;text-decoration: none"></a>
+                    </div>
+                </div>
+                <div class="col-xs-1 col-sm-1" style="width: 1px"></div>
+                <div class="col-xs-3 col-sm-3" style="border: 1px solid silver;width: 200px;height: 200px">
+                    <div class="fileUploadDiv" style="padding:35px 0 0 60px" v-show="!img3.opusImage">
+                        <input type="file" class="input-file" @change="uploadFile3" id="file3">
+                        <a class="btn-link" style="font-size: 72px;color: silver">+</a>
+                    </div>
+                    <div v-show="img3.opusImage">
+                        <img :src="img3.opusImage" height="170px" width="170px">
+                    </div>
+                    <div style="position: relative;height: 25px;width: 200px;font-size: 25px;float: left"
+                         v-show="img3.opusImage">
+                        <a class="glyphicon glyphicon-chevron-left" @click="leftImg3"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-chevron-right" @click="rightImg3"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-remove" @click="removeImg3"
+                           style="color: red;padding-left: 10px;text-decoration: none"></a>
+                    </div>
+                </div>
+                <div class="col-xs-1 col-sm-1" style="width: 1px"></div>
+                <div class="col-xs-3 col-sm-3" style="border: 1px solid silver;width: 200px;height: 200px">
+                    <div class="fileUploadDiv" style="padding:35px 0 0 60px" v-show="!img4.opusImage">
+                        <input type="file" class="input-file" @change="uploadFile4" id="file4">
+                        <a class="btn-link" style="font-size: 72px;color: silver">+</a>
+                    </div>
+                    <div v-show="img4.opusImage">
+                        <img :src="img4.opusImage" height="170px" width="170px">
+                    </div>
+                    <div style="position: relative;height: 25px;width: 200px;font-size: 25px;float: left"
+                         v-show="img4.opusImage">
+                        <a class="glyphicon glyphicon-chevron-left" @click="leftImg4"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-chevron-right"
+                           style="padding-left: 20px;text-decoration: none"></a>
+                        <a class="glyphicon glyphicon-remove" @click="removeImg4"
+                           style="color: red;padding-left: 10px;text-decoration: none"></a>
+                    </div>
+                </div>
+                <div class="col-xs-1 col-sm-1" style="width: 1px"></div>
+                <div class="col-xs-3 col-sm-3" style="border: 1px solid silver;width: 200px;height: 200px">
+                    <div class="fileUploadDiv" style="padding:35px 0 0 60px" v-show="!img5.video">
+                        <input type="file" class="input-file" @change="uploadFile5" id="file5">
+                        <a class="btn-link" style="font-size: 72px;color: silver"><img src="play.png"></a>
+                    </div>
+                    <div v-show="img5.video">
+                        <img :src="img5.video" height="170px" width="170px">
+                    </div>
+                    <div style="position: relative;height: 25px;width: 200px;font-size: 25px;float: left"
+                         v-show="img5.video">
+                        <a class="glyphicon glyphicon-remove" @click="removeImg5"
+                           style="color: red;padding-left: 75px;text-decoration: none"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label  col-xs-3 col-sm-3"><strong>商品详情图</strong>&nbsp;&nbsp;（宝贝主图不能超过3M）</label>
+        </div>
+    </label>
+    <div class="row cl">
+        <div class="col-xs-10 col-sm-10" style="padding-left: 200px">
+            <div id="summer"></div>
+        </div>
+    </div>
+    <div class="row cl">
+        <label class="form-label  col-xs-6 col-sm-6" style="padding-left: 200px">
+            <input type="button" class="btn btn-success" value="立即发布" onclick="saveAndUp()">&nbsp;&nbsp;
+            <input type="button" class="btn btn-success" value="保存为待发布" onclick="saveWithForUp()">
+        </label>
+    </div>
+</form>
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="../../js/base.js"></script>
+<script type="text/javascript" src="../../plugins/jquery.validation/jquery.validate.min.js"></script>
+<script type="text/javascript" src="../../plugins/jquery.validation/messages_zh.min.js"></script>
+<script type="text/javascript" src="../../plugins/summernote-master/dist/summernote.min.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $('#summer').summernote({
+            lang: 'zh-CN',
+            minHeight: null,
+            maxHeight: null,
+            callbacks: {
+                onImageUpload: function (files) {
+                    sendFile(files[0]);
+                }
+            }
+        });
+        $('#myform').validate();
+    })
+
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            model: {
+                "attribute": "",
+                "cover": "",
+                "designer": "",
+                "designerName": "真玫自营",
+                "fileUrl": "",
+                "goodsCategoryType": "",
+                "goodsCategoryUuid": "",
+                "goodsDetails": "",
+                "goodsImages": [
+                    /*{
+                        "cover": "",
+                        "index": "",
+                        "maxImg": "",
+                        "midImg": "",
+                        "minImg": "",
+                        "opusImage": "",
+                        "type": 0,
+                        "video": "",
+                        "videoImg": ""
+                    }*/
+                ],
+                "goodsName": "",
+                "memberUuid": "",
+                "opusUuid": "",
+                "status": ""
+            },
+            data: {
+                dataFile: ""
+            },
+            imgIndex: "",
+            movement: "",
+            imageUrl: ""
+        },
+        methods: {
+            uploadFile0: function () {
+                this.imgIndex = "0";
+                readAsDataURL(event.target, true);
+            },
+            uploadFile1: function () {
+                this.imgIndex = "1";
+                readAsDataURL(event.target, true);
+            },
+            uploadFile2: function () {
+                this.imgIndex = "2";
+                readAsDataURL(event.target, true);
+            },
+            uploadFile3: function () {
+                this.imgIndex = "3";
+                readAsDataURL(event.target, true);
+            },
+            uploadFile4: function () {
+                this.imgIndex = "4";
+                readAsDataURL(event.target, true);
+            },
+            uploadFile5: function () {
+                this.imgIndex = "5";
+                readAsDataURL(event.target, false, 0);
+            },
+            rightImg0: function () {
+                this.imgIndex = "";
+                this.movement = "rightImg0";
+            },
+            leftImg1: function () {
+                this.imgIndex = "";
+                this.movement = "leftImg1";
+            },
+            rightImg1: function () {
+                this.imgIndex = "";
+                this.movement = "rightImg1";
+            },
+            leftImg2: function () {
+                this.imgIndex = "";
+                this.movement = "leftImg2";
+            },
+            rightImg2: function () {
+                this.imgIndex = "";
+                this.movement = "rightImg2";
+            },
+            leftImg3: function () {
+                this.imgIndex = "";
+                this.movement = "leftImg3";
+            },
+            rightImg3: function () {
+                this.imgIndex = "";
+                this.movement = "rightImg3";
+            },
+            leftImg4: function () {
+                this.imgIndex = "";
+                this.movement = "leftImg4";
+            },
+            removeImg0: function () {
+                this.imgIndex = "0";
+                this.movement = "";
+                this.imageUrl = "";
+                $('#file0').val("");
+            },
+            removeImg1: function () {
+                this.imgIndex = "1";
+                this.movement = "";
+                this.imageUrl = "";
+                $('#file1').val("");
+            },
+            removeImg2: function () {
+                this.imgIndex = "2";
+                this.movement = "";
+                this.imageUrl = "";
+                $('#file2').val("");
+            },
+            removeImg3: function () {
+                this.imgIndex = "3";
+                this.movement = "";
+                this.imageUrl = "";
+                $('#file3').val("");
+            },
+            removeImg4: function () {
+                this.imgIndex = "4";
+                this.movement = "";
+                this.imageUrl = "";
+                $('#file4').val("");
+            },
+            removeImg5: function () {
+                this.imgIndex = "5";
+                this.movement = "";
+                this.data.dataFile = "";
+                $('#file5').val("");
+            },
+            uploadFile: function () {
+                this.imgIndex = "6";
+                readAsDataURL(event.target, false, 0);
+            },
+            downloadFile: function () {
+                alert("展现或下载模型素材");
+            },
+            removeFile: function () {
+                this.imgIndex = "6";
+                this.data.dataFile = "";
+                $('#fileUrl').val("");
+            }
+        },
+        computed: {
+            file: function () {
+                if (this.imgIndex == "6")
+                    this.model.fileUrl = this.data.dataFile;
+                return this.model.fileUrl;
+            },
+            img0: function () {
+                if (!this.model.goodsImages[0])
+                    this.model.goodsImages[0] = {};
+                if (this.imgIndex == "0") {
+                    this.model.goodsImages[0].index = 0;
+                    this.model.goodsImages[0].opusImage = this.imageUrl;
+                    this.model.goodsImages[0].type = 0;
+                } else if (this.movement == "rightImg0" || this.movement == "leftImg1") {
+                    this.imageUrl = this.model.goodsImages[0].opusImage;
+                    this.model.goodsImages[0].opusImage = this.model.goodsImages[1].opusImage;
+                }
+                return this.model.goodsImages[0];
+            },
+            img1: function () {
+                if (!this.model.goodsImages[1])
+                    this.model.goodsImages[1] = {};
+                if (this.imgIndex == "1") {
+                    this.model.goodsImages[1].index = 1;
+                    this.model.goodsImages[1].opusImage = this.imageUrl;
+                    this.model.goodsImages[1].type = 0;
+                } else if (this.movement == "rightImg0" || this.movement == "leftImg1") {
+                    this.model.goodsImages[1].opusImage = this.imageUrl;
+                } else if (this.movement == "rightImg1" || this.movement == "leftImg2") {
+                    this.imageUrl = this.model.goodsImages[1].opusImage;
+                    this.model.goodsImages[1].opusImage = this.model.goodsImages[2].opusImage;
+                }
+                return this.model.goodsImages[1];
+            },
+            img2: function () {
+                if (!this.model.goodsImages[2])
+                    this.model.goodsImages[2] = {};
+                if (this.imgIndex == "2") {
+                    this.model.goodsImages[2].index = 2;
+                    this.model.goodsImages[2].opusImage = this.imageUrl;
+                    this.model.goodsImages[2].type = 0;
+                } else if (this.movement == "rightImg1" || this.movement == "leftImg2") {
+                    this.model.goodsImages[2].opusImage = this.imageUrl;
+                } else if (this.movement == "rightImg2" || this.movement == "leftImg3") {
+                    this.imageUrl = this.model.goodsImages[2].opusImage;
+                    this.model.goodsImages[2].opusImage = this.model.goodsImages[3].opusImage;
+                }
+                return this.model.goodsImages[2];
+            },
+            img3: function () {
+                if (!this.model.goodsImages[3])
+                    this.model.goodsImages[3] = {};
+                if (this.imgIndex == "3") {
+                    this.model.goodsImages[3].index = 3;
+                    this.model.goodsImages[3].opusImage = this.imageUrl;
+                    this.model.goodsImages[3].type = 0;
+                } else if (this.movement == "rightImg2" || this.movement == "leftImg3") {
+                    this.model.goodsImages[3].opusImage = this.imageUrl;
+                } else if (this.movement == "rightImg3" || this.movement == "leftImg4") {
+                    this.imageUrl = this.model.goodsImages[3].opusImage;
+                    this.model.goodsImages[3].opusImage = this.model.goodsImages[4].opusImage;
+                }
+                return this.model.goodsImages[3];
+            },
+            img4: function () {
+                if (!this.model.goodsImages[4])
+                    this.model.goodsImages[4] = {};
+                if (this.imgIndex == "4") {
+                    this.model.goodsImages[4].index = 4;
+                    this.model.goodsImages[4].opusImage = this.imageUrl;
+                    this.model.goodsImages[4].type = 0;
+                } else if (this.movement == "rightImg3" || this.movement == "leftImg4") {
+                    this.model.goodsImages[4].opusImage = this.imageUrl;
+                }
+                return this.model.goodsImages[4];
+            },
+            img5: function () {
+                if (!this.model.goodsImages[5])
+                    this.model.goodsImages[5] = {};
+                if (this.imgIndex == "5") {
+                    this.model.goodsImages[5].index = 5;
+                    this.model.goodsImages[5].type = 1;
+                    this.model.goodsImages[5].video = this.data.dataFile;
+                    this.model.goodsImages[5].videoImg = this.data.dataFile;
+                }
+                return this.model.goodsImages[5];
+            }
+        }
+    })
+
+    function saveAndUp() {
+        if ($('#myform').valid()) {
+            var url = '/officially/goods/create';
+            var method = 'post';
+            vm.model.status = 1;
+            vm.model.goodsDetails = $('#summer').summernote('code');
+            axios({url: zmme + url, method: method, data: vm.model}).then(function (response) {
+                if (response.data.code == 0) {
+                    swal({title: "立即发布成功", text: "", type: "success"}, function () {
+                        layer_close();
+                    });
+                } else {
+                    swal({title: "立即发布失败", text: "", type: "error"}, function () {
+                        location.replace(location.href);
+                    });
+                }
+            })
+        }
+
+    }
+
+    function saveWithForUp() {
+        if ($('#myform').valid()) {
+            var url = '/officially/goods/create';
+            var method = 'post';
+            vm.model.status = 0;
+            vm.model.goodsDetails = $('#summer').summernote('code');
+            axios({url: zmme + url, method: method, data: vm.model}).then(function (response) {
+                if (response.data.code == 0) {
+                    swal({title: "保存为待发布成功", text: "", type: "success"}, function () {
+                        layer_close();
+                    });
+                } else {
+                    swal({title: "保存为待发布失败", text: "", type: "error"}, function () {
+                        location.replace(location.href);
+                    });
+                }
+            })
+        }
+
+    }
+
+    function sendFile(file) {
+        var reader = new FileReader();
+        //将文件以Data URL形式读入页面
+        reader.readAsDataURL(file);
+        reader.onload = function (e) {
+            var obj = {
+                "fileData": this.result.split(",")[1],
+                "fileName": file.name,
+                "funcFlag": ""
+            };
+            var param = JSON.stringify(obj);
+            $.ajax({
+                url: fileServiceURL + "/fileUpload/upload",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: param,
+                success: function (data) {
+                    if (data.code == 0) {
+                        $('#summer').summernote('editor.insertImage', data.data.fileUrl);
+                    } else {
+                        swal("插入图片失败！", "", "error");
+                    }
+                },
+                complete: function () {
+
+                },
+                error: function () {
+                    swal("插入图片失败！", "", "error");
+                }
+            })
+        }
+    }
+</script>
+<!--请在下方写此页面业务相关的脚本-->
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

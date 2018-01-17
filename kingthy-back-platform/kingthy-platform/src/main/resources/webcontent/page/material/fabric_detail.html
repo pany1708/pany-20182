@@ -1,0 +1,439 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="Bookmark" href="../../favicon.ico">
+    <link rel="Shortcut Icon" href="../../favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../../css/h-ui/css/H-ui.css"/>
+    <!--<link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css"/>-->
+    <link rel="stylesheet" type="text/css" href="../../css/plugins/sweetalert/sweetalert.css"/>
+    <title>面料详情</title>
+    <style type="text/css">
+        .fileUploadDiv {
+            position: relative;
+            overflow: hidden;
+            float: left !important;
+        }
+    </style>
+</head>
+<body>
+<form class="page-container" id="myform">
+    <div class="form form-horizontal" id="app">
+        <div class="row cl">
+            <strong class="form-label col-xs-2 col-sm-1">面料信息</strong>
+        </div>
+        <div class="line"></div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">物料名称：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.name" :readonly="isEdit" name="data.name" required/>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">面料类型：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <select class="select-box" v-model="data.materielUuid" name="data.materielUuid" :disabled="isEdit"
+                        required>
+                    <option v-for="materiel in materiels" :value="materiel.className">{{materiel.className}}</option>
+                </select>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">计量单位：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.measurement" name="data.measurement"
+                       :readonly="isEdit" required/>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">价格：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.price" name="data.price" :readonly="isEdit"
+                       required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">物料编码：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <lable class="form-label" style="text-align: left">{{data.code}}</lable>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">面料成分：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.component" name="data.component" :readonly="isEdit"
+                       required/>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">纱支：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.yarnCount" name="data.yarnCount" :readonly="isEdit"
+                       required/>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">是否缩水：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <select class="select-box" v-model="data.isShrink" name="data.isShrink" :disabled="isEdit" required>
+                    <option value="true">是</option>
+                    <option value="false">否</option>
+                </select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">幅宽：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.length" name="data.length" :readonly="isEdit"
+                       required/>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">克重：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.weight" name="data.weight" :readonly="isEdit"
+                       required/>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">面料颜色：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <ul class="inline">
+                    <li v-for="color in data.color">
+                        <span :style="{background:'rgb'+color}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a class="btn-link" @click="delColor(color)">ｘ</a>
+                    </li>
+                </ul>
+                <input type="button" class="btn btn-link" value="新增" @click="addColor" v-show="!isEdit"/>
+            </div>
+            <!--以下为弹出层-->
+            <div id="colorDialog" style="display: none;padding: 10px">
+                <span>颜色编号：</span><input type="text" class="input-text" style="width: 251px" v-model="selectColor"/>
+                <input type="button" class="btn btn-success" value="确定" @click="confirmColor"/>
+                <div class="line"></div>
+                <div style="padding: 10px">
+                    <ul v-for="colors in colorsTemp" class="inline">
+                        <li v-for="colorTemp in colors">
+                            <input type="radio" v-model="color" :value="colorTemp"/>rgb{{colorTemp}}<span
+                                :style="{background:'rgb'+colorTemp}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!--以上为弹出层-->
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">效果图片：</label>
+            <div class="formControls col-xs-13 col-sm-11">
+                <ul>
+                    <li v-for="img in fileUrls" style="display: inline;">
+                        <a :href="img" target="_blank"><img :src="img" alt="图片" width="10%"/></a>
+                        <a title="删除" @click="removeImg(img)" v-show="!isEdit"><i>删除</i></a>
+                    </li>
+                </ul>
+                <div class="fileUploadDiv" v-show="!isEdit">
+                    <input type="file" class="input-file" @change="uploadImg">
+                    <a class="btn btn-upload">选择图片</a>
+                </div>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">安全库存：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.isStock" name="data.isStock" :readonly="isEdit"
+                       required/>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">洗涤要求：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.washingReq" name="data.washingReq"
+                       :readonly="isEdit" required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">备注说明：</label>
+            <div class="formControls col-xs-8 col-sm-6">
+                <textarea class="textarea" v-model="data.remark" name="data.remark" :readonly="isEdit"
+                          required></textarea>
+            </div>
+        </div>
+        <div class="row cl">
+            <strong class="form-label col-xs-2 col-sm-1">采样信息</strong>
+        </div>
+        <div class="line"></div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">供应商：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.supplier" name="data.supplier" :readonly="isEdit"
+                       required/>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">联系人：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.linkman" name="data.linkman" :readonly="isEdit"
+                       required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">联系电话：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="tel" class="input-text" v-model="data.linktel" name="data.linktel" :readonly="isEdit"
+                       required/>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">联系手机：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="phone" class="input-text" v-model="data.linkphone" name="data.linkphone" :readonly="isEdit"
+                       required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">仿真编号：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" class="input-text" v-model="data.faxnum" name="data.faxnum" :readonly="isEdit"
+                       required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">面料状态：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="radio" value="0" v-model="data.status" name="data.status" class="radio-box"
+                       :disabled="isEdit" required/>待采样
+                <input type="radio" value="1" v-model="data.status" name="data.status" class="radio-box"
+                       :disabled="isEdit" required/>已仿真
+                <input type="radio" value="2" v-model="data.status" name="data.status" class="radio-box"
+                       :disabled="isEdit" required/>已入库
+            </div>
+        </div>
+        <div class="row cl">
+            <ul class="inline">
+                <li>
+                    <div v-show="data.chartletFile != null && data.chartletFile != ''">
+                        <img :src="data.chartletFile" style="padding-left: 50px" width="110px"/>
+                    </div>
+                    <div class="formControls " style="padding-left: 50px" v-show="!isEdit">
+                        <div class="fileUploadDiv">
+                            <input type="file" class="input-file" @change="uploadChartFile">
+                            <a class="btn btn-upload">上传贴图数据</a>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div style="margin: 25px" v-show="data.dataFile != null && data.dataFile != ''">
+                        <input type="button" class="btn btn-success" value="模型"/>
+                    </div>
+
+                    <div class="formControls col-xs-1 col-sm-1" v-show="!isEdit">
+                        <div class="fileUploadDiv">
+                            <input type="file" class="input-file" @change="uploadFile">
+                            <a class="btn btn-upload">上传模型</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="row cl" style="padding: 50px;" v-show="!isEdit">
+            <input type="button" value="确定" class="btn btn-success" @click="save"/>
+        </div>
+    </div>
+</form>
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="../../js/base.js"></script>
+<script type="text/javascript" src="../../plugins/jquery.validation/jquery.validate.min.js"></script>
+<script type="text/javascript" src="../../plugins/jquery.validation/messages_zh.min.js"></script>
+<script type="text/javascript">
+    $('#myform').validate();
+    var uuid = getUrlParmsByName("uuid");
+    var isEdit = getUrlParmsByName("isEdit");
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            data: {
+                chartletFile: '',
+                code: '',
+                color: '',
+                component: '',
+                dataFile: '',
+                faxnum: '',
+                image: [],
+                isShrink: '',
+                isStock: '',
+                length: '',
+                linkman: '',
+                linkphone: '',
+                linktel: '',
+                materielUuid: '',
+                measurement: '',
+                name: '',
+                price: '',
+                remark: '',
+                status: '',
+                supplier: '',
+                washingReq: '',
+                weight: '',
+                yarnCount: ''
+            },
+            materiels: '',
+            imageUrl: '',
+            selectColor: '',
+            color: '',
+            isEdit: false
+        },
+        created: function () {
+            this.isEdit = isEdit == 'false' ? true : false;
+            axios.get(zmme + "/materielCategory/queryAll").then(function (response) {
+                var result = response.data;
+                if (result.code == 0)
+                    vm.materiels = result.data;
+            })
+            if (uuid)
+                axios.get(zmme + "/material/" + uuid).then(function (response) {
+                        var result = response.data;
+                        if (result.code == 0) {
+                            vm.data = result.data;
+                            vm.data.image = JSON.parse(vm.data.image);
+                            vm.data.color = JSON.parse(vm.data.color);
+                        } else {
+                            swal("加载数据错误！", result.message, "error");
+                        }
+                    }
+                ).catch(function (response) {
+
+                })
+        },
+        methods: {
+            addColor: function () {
+                layer.open({
+                    type: 1,
+                    title: '新增颜色',
+                    area: ['1000px', '600px'],
+                    shade: 0.3,
+                    content: $('#colorDialog')
+                });
+            },
+            confirmColor: function () {
+                if (this.color != '') {
+                    if (this.data.color == '') {
+                        this.data.color = [];
+                    }
+                    this.data.color.push(this.color);
+                    var dom = $('div.layui-layer.layui-layer-page.layer-anim').attr('id');
+                    dom = dom.substr(dom.indexOf('layer') + 5);
+                    layer.close(dom);
+                }
+            },
+            delColor: function (color) {
+                this.data.color.remove(color);
+            },
+            uploadImg: function (event) {
+//                var name = target.value;
+//                var fileName = name.substring(name.lastIndexOf(".") + 1).toLowerCase();
+//                if (fileName != "jpg" && fileName != "jpeg" && fileName != "png") {
+//                    swal("请选择图片格式文件上传(jpg,png,)！", "", "info");
+//                }
+//                swal(name, fileName, "info");
+//                var fileSize = 0;
+//                if (!target.files) {
+//                    var filePath = target.value;
+//                    var fileSystem = new ActiveXObject("Scripting.FileSystemObject");
+//                    var file = fileSystem.GetFile(filePath);
+//                    fileSize = file.Size;
+//                } else {
+//                    fileSize = target.files[0].size;
+//                }
+//                var size = fileSize / 1024;
+//                if (size > 2000) {
+//                    alert("附件不能大于2M");
+//                    target.value = "";
+//                    return
+//                }
+                readAsDataURL(event.target, true);
+                swal("上传中", "", "loading");
+            },
+            uploadFile: function () {
+                readAsDataURL(event.target, false, 0);
+            },
+            uploadChartFile: function () {
+                readAsDataURL(event.target, false, 1);
+            },
+            removeImg: function (img) {
+                this.data.image.remove(img);
+                this.imageUrl = '';
+            },
+            save: function () {
+                if ($('#myform').valid()) {
+                    this.data.image = JSON.stringify(this.data.image);
+                    this.data.color = JSON.stringify(this.data.color);
+//                this.data.createDate = null;
+//                this.data.modifyDate = null;
+                    var url = '';
+                    if (uuid) {
+                        url = '/material/updateMaterial';
+                    } else {
+                        url = '/material/create';
+                    }
+                    axios.post(zmme + url, this.data).then(function (response) {
+                        if (response.data.code == 0) {
+                            swal({title: "保存面料成功", text: "", type: "success"}, function () {
+                                if (uuid) location.replace(location.href); else layer_close();
+                            });
+                        } else {
+                            swal({title: "保存面料失败", text: "", type: "error"}, function () {
+                                location.replace(location.href);
+                            });
+                        }
+                    })
+                }
+            }
+        },
+        computed: {
+            colorsTemp: function () {
+                if (Boolean(this.selectColor)) {
+                    var colors = getColors(this.selectColor);
+                    var arrTemp = [];
+                    var index = 0;
+                    var sectionCount = 6;
+                    if (colors.length > 0)
+                        for (var i = 0; i < colors.length; i++) {
+                            index = parseInt(i / sectionCount);
+                            if (arrTemp.length <= index) {
+                                arrTemp.push([]);
+                            }
+                            arrTemp[index].push(colors[i]);
+                        }
+                    return arrTemp;
+                } else {
+                    return [];
+                }
+            },
+            fileUrls: function () {
+                if (this.data.image == '') {
+                    this.data.image = [];
+                }
+                if (this.imageUrl != '') {
+                    this.data.image.push(this.imageUrl);
+                }
+                return this.data.image;
+            }
+        }
+    })
+
+    function getColors(color) {
+        var result = [];
+        $.ajax({
+            url: zmme + '/material/selectColor/' + color,
+            method: 'get',
+            async: false,
+            dataType: 'json',
+            success: function (data) {
+                result = data.data;
+            }
+        })
+        return result;
+    }
+
+    /*数组属性扩展*/
+    Array.prototype.indexOf = function (val) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] == val) return i;
+        }
+        return -1;
+    };
+    Array.prototype.remove = function (val) {
+        var index = this.indexOf(val);
+        if (index > -1)
+            this.splice(index, 1);
+    };
+</script>
+<!--请在下方写此页面业务相关的脚本-->
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

@@ -1,0 +1,146 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<meta http-equiv="Cache-Control" content="no-siteapp" />
+	<link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../../../css/plugins/sweetalert/sweetalert.css">
+	<title>材质分类-详情</title>
+</head>
+
+<body>
+	<div id="app" style="margin-top:30px">
+		<form class=" form-horizontal center-block" id="myform" name="myform" >
+			<div class="form-group">
+				<label class="col-sm-2 control-label"><span style="color:red">*</span>分类名称:</label>
+				<div class="col-sm-6">
+					<input type="text" class="form-control" value="" id="className" name="className" v-model="model.className" placeholder=""
+					/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label"><span style="color:red">*</span>分类状态:</label>
+				<div class="col-sm-6">
+					<lable class="radio-inline">
+						<input type="radio" id="status-1" name="status" value="true" checked v-model="model.status" />
+						<label for="status-1">显示</label>
+					</lable>
+					<lable class="radio-inline">
+						<input type="radio" id="status-0" name="status" value="false" v-model="model.status" />
+						<label for="status-0">隐藏</label>
+					</lable>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">描述：</label>
+				<div class="col-sm-6">
+					<textarea name="description" v-model="model.description" class="form-control" cols="" rows="5" placeholder="说点什么...255个字符以内"
+					 dragonfly="true"></textarea>
+					<p class="textarea-numberbar"><em class="textarea-length">0</em>/255</p>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="button" class="btn btn-primary" @click="onSubmit">提交</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<script type="text/javascript" src="../../../js/base.js"></script>
+	<script type="text/javascript" src="../../../plugins/jquery.validation/jquery.validate.js"></script>
+	<script type="text/javascript" src="../../../plugins/jquery.validation/jquery.validate-default.js"></script>
+
+	<script type="text/javascript">
+		//Vue.prototype.$http = axios;
+		var parmObj = getLocalUrlParms();
+		console.log(parmObj);
+		//定义数据保存执行的url
+		var url = zmme + "/materielCategory/create";
+		//定义数据保存行的url请求方式POST：新增，PUT:修改
+		var method = "POST";
+
+		//Vue操作
+		var vm = new Vue({
+			el: '#app',
+			//数据
+			data: {
+				//定义用于绑定的一个对象
+				model: {},
+			},
+			//加载页面时执行
+			created: function () {
+				//初始化部分参数值
+				this.model = { status: true };
+				//如果是编辑，根据uuid加载数据
+				if (parmObj.operate == "update") {
+					//修改url为更新url,修改method为url对应的请求方式
+					url = zmme + "/materielCategory/update";
+					method = "PUT";
+					//获取编辑的数据并显示
+					this.viewEditData();
+				}
+
+			},
+			mounted: function () {
+				this.initValidate();
+			},
+			//方法
+			methods: {
+				onSubmit: function () {
+					//保存数据
+					if ($("#myform").valid()) {
+						var data = this.model;
+						//通过验证    
+						axios({
+							method: method,
+							url: url,
+							data: data
+						}).then(response => {
+							var result = response.data;
+							if (result.code == 0) {
+								layer_close();
+							} else {
+								swal("错误！", result.message, "error");
+							}
+						});
+					}
+				},
+				viewEditData: function () {
+					//根据uuid获取数据，并显示在页面
+					axios.get(zmme + "/materielCategory/query/" + parmObj.uuid).then(response => {
+						var result = response.data;
+						if (result.code == 0) {
+							//绑定到对象
+							this.model = result.data;
+						} else {
+							swal("错误！", result.message, "error");
+						}
+					})
+				},
+				//初始化表单校验
+				initValidate: function () {
+					$("#myform").validate({
+						rules: {
+							className: "required",
+							status: "required"
+						},
+						messages: {
+							className: "请输入分类名称",
+							status: "请设置状态"
+						}
+					});
+				}
+			}
+		});
+		/*--------vue---end----------*/
+
+		
+	</script>
+
+</body>
+
+</html>

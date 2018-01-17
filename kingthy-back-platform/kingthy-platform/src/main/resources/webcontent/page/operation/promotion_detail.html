@@ -1,0 +1,167 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="Bookmark" href="../../favicon.ico">
+    <link rel="Shortcut Icon" href="../../favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../../css/h-ui/css/H-ui.css"/>
+    <!--<link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css"/>-->
+    <link rel="stylesheet" type="text/css" href="../../css/plugins/sweetalert/sweetalert.css"/>
+    <title>优惠活动</title>
+</head>
+<body>
+<form class="page-container" id="myform">
+    <div class="form form-horizontal" id="app">
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">活动名称：</label>
+            <div class="formControls col-xs-5 col-sm-3">
+                <input type="text" class="input-text" v-model="data.activityName" :readonly="isEdit"
+                       name="data.activityName"
+                       required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">优惠活动类型：</label>
+            <div class="formControls col-xs-5 col-sm-3">
+                <input type="radio" class="radio-box" v-model="data.policyType" :disabled="isEdit"
+                       name="data.policyType" required value="0" />折扣优惠&nbsp;&nbsp;&nbsp;
+                <input type="radio" class="radio-box" v-model="data.policyType" :disabled="isEdit"
+                       name="data.policyType" required value="1" />满减活动
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">{{policyName}}：</label>
+            <div class="formControls col-xs-5 col-sm-3">
+                <input type="text" class="input-text" v-model="data.policy" :readonly="isEdit" name="data.policy"
+                       required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">活动开始时间：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" onfocus="WdatePicker({maxDate:'#F{$dp.$D(\'endTime\')||\'%y-%M-%d\'}'})"
+                       class="input-text Wdate" style="width:250px;" id="beginTime" name="beginTime" :disabled="isEdit"
+                       required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">活动结束时间：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <input type="text" onfocus="WdatePicker({minDate:'#F{$dp.$D(\'beginTime\')||\'%y-%M-%d\'}'})"
+                       class="input-text Wdate" style="width:250px;" id="endTime" name="endTime" :disabled="isEdit"
+                       required/>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">参与商品：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <select class="select-box" v-model="data.joinGoods" style="" :disabled="isEdit">
+                    <option value="null">全部</option>
+                    <option value="0">上衣</option>
+                    <option value="1">裤装</option>
+                    <option value="2">裙装</option>
+                    <option value="2">套装</option>
+                </select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">活动描述：</label>
+            <div class="formControls col-xs-6 col-sm-5">
+                <textarea class="textarea" v-model="data.description" name="data.description" :readonly="isEdit"
+                          required></textarea>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="row cl" style="padding: 50px;" v-show="!isEdit">
+                <input type="button" value="确定" class="btn btn-success" @click="save"/>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="../../js/base.js"></script>
+<script type="text/javascript" src="../../plugins/jquery.validation/jquery.validate.min.js"></script>
+<script type="text/javascript" src="../../plugins/jquery.validation/messages_zh.min.js"></script>
+<script type="text/javascript" src="../../plugins/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript">
+    var policyType = getUrlParmsByName("policyType");
+    if(!Boolean(policyType))
+        policyType = "0";
+    $('#myform').validate();
+    var uuid = getUrlParmsByName("uuid");
+    var isEdit = getUrlParmsByName("isEdit");
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            data: {
+                "activityName": null,
+                "description": null,
+                "endTime": null,
+                "joinGoods": null,
+                "policy": null,
+                "policyType": policyType,
+                "startTime": null,
+                "status": "before"
+            }
+        },
+        created: function () {
+            this.isEdit = isEdit == 'false' ? true : false;
+            if (uuid)
+                axios.get(zmme + "/salesPromotion/findByUuid/" + uuid).then(function (response) {
+                        var result = response.data;
+                        if (result.code == 0) {
+                            vm.data = result.data;
+                            $('#beginTime').val(new Date(vm.data.startTime).toLocaleString());
+                            $('#endTime').val(new Date(vm.data.endTime).toLocaleString());
+                        } else {
+                            swal("加载数据错误！", result.message, "error");
+                        }
+                    }
+                ).catch(function (response) {
+
+                })
+        },
+        methods: {
+            save: function () {
+                if ($('#myform').valid()) {
+                    vm.data.startTime = new Date($('#beginTime').val());
+                    vm.data.endTime = new Date($('#endTime').val());
+                    var url = '';
+                    if (uuid) {
+                        url = '/salesPromotion/update';
+                    } else {
+                        url = '/salesPromotion/add';
+                    }
+                    axios.post(zmme + url, this.data).then(function (response) {
+                        if (response.data.code == 0) {
+                            swal({title: "保存优惠活动成功", text: "", type: "success"}, function () {
+                                if (uuid) location.replace(location.href); else layer_close();
+                            });
+                        } else {
+                            swal({title: "保存优惠活动失败", text: "", type: "error"}, function () {
+                                location.replace(location.href);
+                            });
+                        }
+                    })
+                }
+            }
+        },
+        computed: {
+            policyName: function () {
+                return this.data.policyType == "0" ? "折扣优惠" : "满减额";
+            }
+        }
+    })
+
+</script>
+<!--请在下方写此页面业务相关的脚本-->
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

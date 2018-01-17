@@ -1,0 +1,184 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="Bookmark" href="../../favicon.ico">
+    <link rel="Shortcut Icon" href="../../favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../../css/h-ui/css/H-ui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/plugins/sweetalert/sweetalert.css"/>
+    <title>发票详情</title>
+</head>
+<body>
+<form class="page-container" id="myform">
+    <div class="form form-horizontal" id="app">
+        <div class="row cl">
+            <strong class="form-label col-xs-2 col-sm-1">基本信息</strong>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">订单编号：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.orderSn}}</label>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">订单状态：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.status}}</label>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">下单用户：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.memberName}}</label>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">下单时间：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.createDate}}</label>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">付款方式：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.paymentMethodType}}</label>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">支付时间：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.paymentDate}}</label>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">配送方式：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <span></span>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">发货时间：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.deliveryDate}}</label>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">运单号：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.shippingNumber}}</label>
+            </div>
+        </div>
+        <div class="row cl">
+            <strong class="form-label col-xs-2 col-sm-1">收货人信息</strong>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">收货人：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.consignee}}</label>
+            </div>
+            <label class="form-label col-xs-2 col-sm-1">联系电话：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.phone}}</label>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-1">收货地址：</label>
+            <div class="formControls col-xs-3 col-sm-2">
+                <label>{{orderDetail.address}}</label>
+            </div>
+        </div>
+        <div class="row cl">
+            <strong class="form-label col-xs-2 col-sm-1">发票信息</strong>
+        </div>
+        <div class="row cl">
+            <div style="padding-left: 15px;">
+                <table border="1px" style="text-align: center;border-color: #eee">
+                    <thead>
+                    <th style="text-align: center"><strong>发票编号</strong></th>
+                    <th style="text-align: center"><strong>发票抬头</strong></th>
+                    <th style="text-align: center"><strong>发票金额</strong></th>
+                    <th style="text-align: center"><strong>发票类型</strong></th>
+                    <th style="text-align: center"><strong>发票状态</strong></th>
+                    <th style="text-align: center"><strong>付款时间</strong></th>
+                    <th style="text-align: center"><strong>开票时间</strong></th>
+                    </thead>
+                    <tbody>
+                    <tr v-for="invoice in invoiceList">
+                        <td>{{invoice.invoiceNo}}</td>
+                        <td>{{invoice.invoiceTitle}}</td>
+                        <td>{{invoice.amount}}</td>
+                        <td>{{invoice.invoiceType==0?'个人':'公司'}}</td>
+                        <td>{{invoice.status==0?'申请中':'完成'}}</td>
+                        <td>{{invoice.paymentDate}}</td>
+                        <td>{{invoice.billingTime}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="../../js/base.js"></script>
+<script type="text/javascript" src="../../plugins/jquery.validation/jquery.validate.min.js"></script>
+<script type="text/javascript" src="../../plugins/jquery.validation/messages_zh.min.js"></script>
+<script type="text/javascript">
+    $('#myform').validate();
+    var orderSn = getUrlParmsByName("orderSn");
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            "invoiceList": "",
+            "orderDetail": {
+                "orderSn": "",
+                "status": "",
+                "memberName": "",
+                "createDate": "",
+                "paymentMethodType": 0,
+                "paymentDate": "",
+                "shippingMethodName": "",
+                "deliveryDate": "",
+                "shippingNumber": "",
+                "consignee": "",
+                "phone": "",
+                "areaName": "",
+                "address": ""
+            }
+        },
+        created: function () {
+            axios.get(zmme + "/invoice/show/" + orderSn).then(function (response) {
+                    var result = response.data;
+                    if (result.code == 0) {
+                        vm.orderDetail = result.data.orderDetail;
+                        vm.invoiceList = result.data.invoiceList;
+                        switch (vm.orderDetail.status) {
+                            case 1: vm.orderDetail.status = "生产中";break;
+                            case 2: vm.orderDetail.status = "待发货";break;
+                            case 3: vm.orderDetail.status = "待签收";break;
+                            case 4: vm.orderDetail.status = "待评价";break;
+                            case 5: vm.orderDetail.status = "已取消";break;
+                            case 6: vm.orderDetail.status = "待退单";break;
+                            case 7: vm.orderDetail.status = "已完成";break;
+                            default: vm.orderDetail.status = "代付款";
+                        }
+                        /* 0:支付宝 1:微信 2:银联 3:QQ钱包 4:余额*/
+                        switch (vm.orderDetail.paymentMethodType) {
+                            case 1: vm.orderDetail.paymentMethodType = "微信";break;
+                            case 2: vm.orderDetail.paymentMethodType = "银联";break;
+                            case 3: vm.orderDetail.paymentMethodType = "QQ钱包";break;
+                            case 4: vm.orderDetail.paymentMethodType = "余额";break;
+                            default: vm.orderDetail.paymentMethodType = "支付宝";
+                        }
+                    } else {
+                        swal("加载数据错误！", result.message, "error");
+                    }
+                }
+            ).catch(function (response) {
+
+            })
+        }
+    })
+</script>
+<!--请在下方写此页面业务相关的脚本-->
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

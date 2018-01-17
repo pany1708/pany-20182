@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>商品分类</title>
+
+
+    <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/plugins/sweetalert/sweetalert.css">
+    <link rel="stylesheet" type="text/css" href="../../../plugins/ztree/css/zTreeStyle/zTreeStyle.css">
+    <!--<link rel="stylesheet" type="text/css" href="../../../plugins/ztree/css/metroStyle/metroStyle.css">-->
+</head>
+
+<body>
+
+
+    <!--商品转移-->
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="transfer">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">商品分类转移</h4>
+                </div>
+                <div class="modal-body">
+                    <form class=" form-inline">
+                        <div class="form-group">
+                            <label class=" control-label">分类:</label>
+                            <input class="form-control" type="text" id="tranferClass" v-model="model.className" readonly/>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label"><span style="color:red">*</span>转移到分类:</label>
+                            <select id="targetClass" class="form-control  subClass" style="width:200px"></select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" @click="saveTransfer">保存</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <!--导航-->
+    <nav class="breadcrumb" style="position: relative;height: 40px;line-height: 24px;"><i class="glyphicon glyphicon-home"></i> 首页 <span class="c-gray en">&gt;</span> 基础数据 <span class="c-gray en">&gt;</span>        商品管理
+        <span class="c-gray en">&gt;</span> 商品分类
+
+        <a class="btn btn-success topBtn" style="position: absolute;right:15px;top: 4px;padding: 5px 12px;" href="javascript:location.replace(location.href);"
+            title="刷新"><i class="glyphicon glyphicon-refresh"></i>
+        </a>
+
+    </nav>
+    <div class="page-container">
+        <div class="row" id="app">
+            <div class="col-xs-2">
+                <div class="panel panel-default" style="height:810px">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-5">
+                                <h3 class="panel-title ">商品分类</h3>
+                            </div>
+                            <div class="col-xs-6 "><a class="btn btn-sm btn-primary" data-title="新增一级分类" onclick="addTopClass()" href="javascript:;"><i class="glyphicon glyphicon-plus"></i> 新增一级分类</a></div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <ul id="ztreeDemo" class="ztree"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-10">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">详情</h3>
+                    </div>
+                    <div class="panel-body ">
+                        <form class=" form-horizontal " name="myform" role="form">
+                            <div class="form-group ">
+                                <label class="col-sm-2 control-label">分类名称:</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" value="" name="className" v-model="model.className" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label class="col-sm-2 control-label">作品数量:</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" value="" name="goodsNum" v-model="model.goodsNum" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">分类状态:</label>
+                                <div class="col-sm-6">
+                                    <lable class="radio-inline">
+                                        <input type="radio" id="status-1" name="status" value="true" checked v-model="model.status" />
+                                        <label for="status-1">显示</label>
+                                    </lable>
+                                    <lable class="radio-inline">
+                                        <input type="radio" id="status-0" name="status" value="false" v-model="model.status" />
+                                        <label for="status-0">隐藏</label>
+                                    </lable>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">描述：</label>
+                                <div class="col-sm-6">
+                                    <textarea name="description" v-model="model.description" class="form-control" cols="" rows="5" dragonfly="true" readonly></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="../../../js/base.js"></script>
+    <script type="text/javascript" src="../../../plugins/ztree/jquery.ztree.all.js"></script>
+    <script>
+        //tree 配置
+        var ztreeObj;
+        var setting = {
+
+            view: {
+                showIcon: true,
+                showLine: false,
+                addDiyDom: addDiyDom
+
+            },
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: "uuid",
+                    pIdKey: "parentId",
+                    rootPId: "0"
+                },
+                key: {
+                    name: "className",
+                    title: "className"
+                }
+            },
+            edit: {
+                editNameSelectAll: false,
+                enable: false,
+                removeTitle: "删除",
+                renameTitle: "修改",
+                showRemoveBtn: false,
+                showRenameBtn: false
+            },
+            callback: {
+                onClick: ztreeOnClick
+            }
+
+        }
+        //Vue 
+        var vm_detail = new Vue({
+            el: '#app',
+            //数据
+            data: {
+                //定义用于绑定的一个对象
+                model: {},
+            },
+            created: function () {
+                //初始化树
+                getProductClass();
+                getBigSub();
+            },
+            methods: {
+                editClass: function () {
+                    alert("点击我了")
+                }
+            }
+        })
+        //Vue 
+        var vm_transfer = new Vue({
+            el: '#transfer',
+            //数据
+            data: {
+                //定义用于绑定的一个对象
+                model: {},
+            },
+            created: function () {
+                //初始化树
+
+            },
+            methods: {
+                saveTransfer: function () {
+
+                    var targetUuid = $(".subClass").find("option:selected").val();
+                    var targetGrade = $(".subClass").find("option:selected").attr("grade");
+                    var data = {
+                        "sourceGrade": this.model.grade,
+                        "sourceUuid": this.model.uuid,
+                        "targetGrade": targetGrade,
+                        "targetUuid": targetUuid
+                    }
+                    console.log(JSON.stringify(data));
+                    axios.put(zmme + "/classCategory/transfer", data).then(response => {
+                        var result = response.data;
+                        console.log(JSON.stringify(result));
+                        if (result.code == 0) {
+                            $('#transfer').modal('hide');
+                            swal("执行成功！", "", "success");
+                        } else {
+                            swal("错误！", result.message, "error");
+                        }
+                    })
+                }
+            }
+        })
+        //节点单击事件
+        function ztreeOnClick(event, treeId, treeNode) {
+            vm_detail.model = treeNode
+        }
+        /*节点添加子定义控件*/
+        function addDiyDom(treeId, treeNode) {
+            var aObj = $("#" + treeNode.tId + "_a");
+            if ($("#diyBtn_" + treeNode.id).length > 0) return;
+
+            var hideOrShow = "showClass";
+            if (treeNode.status == 0) {
+                //隐藏
+                hideOrShow = "hideClass";
+            }
+
+            var editStr =
+                "<span id='diyBtn_space_" + treeNode.id + "' > </span>" +
+                "<span href='#'    title='新增'   class='button add'       onclick=\"addNode('" + treeNode.tId + "')\" ></span>" +
+                //"<span href='#'    title='隐藏/显示'   class='button " + hideOrShow + "'  onclick=\"hideOrView('" + treeNode.uuid + "','" + treeNode.status + "')\" ></span>" +
+                "<span href='#'    title='转移'   class='button transfer'  onclick=\"transfer('" + treeNode.tId + "')\" ></span>" +
+                "<span href='#'    title='编辑'   class='button edit'      onclick=\"editNode('" + treeNode.tId + "')\"  ></span>" +
+                "<span href='#'    title='删除'   class='button remove'    onclick=\"delNode('" + treeNode.tId + "')\" ></span>";
+            var btnHtml = $(editStr);
+            $(aObj).append(btnHtml);
+        };
+        //获取商品分类数据
+        function getProductClass() {
+            axios.get(zmme + "/classCategory/findNodes").then(response => {
+                var result = response.data;
+                if (result.code == 0) {
+                    console.log(result.data);
+                    ztreeObj = $.fn.zTree.init($('#ztreeDemo'), setting, result.data);
+                    ztreeObj.expandAll(true);
+                } else {
+                    swal("错误！", result.message, "error");
+                }
+            })
+        }
+        //添加根节点
+        function addTopClass() {
+            layer_show("新增->商品分类", "product-category-detail.html?operate=add", 800, 450, function () {
+                //做点什么吧....
+                //getProductClass();
+            })
+        }
+        //在当前节点下添加子分类
+        function addNode(tid) {
+            var treeNode = ztreeObj.getNodeByTId(tid)
+            vm_detail.model = treeNode
+            layer_show("新增->商品分类", "product-category-detail.html?operate=add&uuid=" + treeNode.uuid + "&grade=" + treeNode.grade, 800, 450, function () {
+                //做点什么吧....
+                getProductClass();
+                getBigSub();
+            })
+        }
+        //编辑
+        function editNode(tid) {
+            var treeNode = ztreeObj.getNodeByTId(tid)
+            vm_detail.model = treeNode
+            layer_show("编辑->商品分类", "product-category-detail.html?operate=update&uuid=" + treeNode.uuid, 800, 450, function () {
+                //做点什么吧....
+                getProductClass();
+                getBigSub();
+
+            })
+        }
+        //隐藏/显示
+        function hideOrView(tid) {
+            var treeNode = ztreeObj.getNodeByTId(tid)
+            vm_detail.model = treeNode
+            var status = treeNode.status;
+            if (status == 0) {
+                status = 1;
+            } else {
+                status = 0;
+            }
+            var data = { uuid: treeNode.uuid, status: status }
+            axios.put(zmme + "/classCategory/edit", data).then(response => {
+                var result = response.data;
+                if (result.code == 0) {
+                    getProductClass();
+                } else {
+                    swal("错误！", result.message, "error");
+                }
+            })
+        }
+        //转移
+        function transfer(tid) {
+            var treeNode = ztreeObj.getNodeByTId(tid)
+            vm_transfer.model = treeNode
+            $('#transfer').modal();
+        }
+        //删除
+        function delNode(tid) {
+            var treeNode = ztreeObj.getNodeByTId(tid)
+            swal({
+                title: "删除确认",
+                text: "数据删除后将无法恢复，请谨慎操作！",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "删除",
+                closeOnConfirm: false
+            }, function () {
+                axios.delete(zmme + "/classCategory/delete/" + treeNode.uuid).then((response) => {
+                    var result = response.data;
+                    if (result.code == 0) {
+                        getProductClass();
+                        getBigSub();
+                        swal("删除成功！", "您已经永久删除了这条信息。", "success");
+
+                    } else {
+                        swal("删除失败！", result.message, "error");
+                    }
+
+                });
+
+            });
+        }
+        // 获取作品品类
+        function getBigSub() {
+
+            $(".subClass").empty();
+            $.ajax({
+                type: 'get',
+                url: zmme + "/classCategory/findAll",
+                async: false,
+                success: function (res) {
+                    if (res.code == 0) {
+                        getCategory(res.data, "subClass");
+                        //setSelectedValue(selectedUuid);
+                    } else {
+                        swal("错误！", res.message, "error");
+                    }
+                }
+
+            })
+        }
+        // 获取作品品类填充到select
+        function getCategory(data, styleClass) {
+            for (var i = 0; i < data.length; i++) {
+                var str = " ";
+                for (var n = 0; n < data[i].grade; n++) {
+                    str += "&nbsp;&nbsp;&nbsp;&nbsp;";
+                };
+                if (data[i].childrens && (data[i].grade == 0)) {
+                    $("." + styleClass).append('<option value="' + data[i].uuid + '" grade="' + data[i].grade + '">' + data[i].className + '</option>');
+                    if (data[i].childrens != null) {
+                        getCategory(data[i].childrens, styleClass);
+                    };
+                } else {
+                    $("." + styleClass).append('<option value="' + data[i].uuid + '" grade="' + data[i].grade + '">' + str + data[i].className + '</option>');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

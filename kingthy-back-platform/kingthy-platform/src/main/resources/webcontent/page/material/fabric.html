@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/h-ui/css/H-ui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/plugins/bootstrap-table/bootstrap-table.min.css"/>
+    <!-- Sweet Alert -->
+    <link rel="stylesheet" type="text/css" href="../../css/plugins/sweetalert/sweetalert.css"/>
+
+    <title>面料管理</title>
+</head>
+
+<body>
+
+<!--导航-->
+<nav class="breadcrumb"><i class="glyphicon glyphicon-home"></i> 首页 <span class="c-gray en">&gt;</span> 面辅料管理 <span
+        class="c-gray en">&gt;</span> 面料管理
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+       href="javascript:location.replace(location.href);"
+       title="刷新"><i class="glyphicon glyphicon-refresh"></i></a>
+</nav>
+<div class="page-container">
+    <!--操作按钮-->
+    <div class="text-c" id="search">
+        面料编号：<input type="text" placeholder="面料编号" style="width:250px" class="input-text" v-model="model.code"/>
+        面料名称：<input type="text" placeholder="面料名称" style="width:250px" class="input-text" v-model="model.name"/>
+        面料分类：
+        <select class="select-box" v-model="model.materielUuid" style="width: auto">
+            <option v-for="materiel in materiels" :value="materiel.className">{{materiel.className}}</option>
+        </select>
+        <!--创建时间：
+        <input type="text" onfocus="WdatePicker({maxDate:'#F{$dp.$D(\'endTime\')||\'%y-%M-%d\'}'})"
+               class="input-text Wdate" style="width:120px;" id="beginTime"/>
+        -
+        <input type="text" onfocus="WdatePicker({minDate:'#F{$dp.$D(\'beginTime\')}'})"
+               class="input-text Wdate" style="width:120px;" id="endTime"/>-->
+        <button class="btn btn-success" type="button" @click="search">搜索</button>
+        <button class="btn btn-success" type="button" @click="addFabric" style="float: right"><i
+                class="glyphicon glyphicon-plus">添加面料</i></button>
+    </div>
+
+    <ul class="nav nav-tabs" id="myTab">
+        <li><a href="#tab-pane-0" status="">所有</a></li>
+        <li><a href="#tab-pane-1" status="0">待采样</a></li>
+        <li><a href="#tab-pane-2" status="1">待仿真</a></li>
+        <li><a href="#tab-pane-3" status="2">已入库</a></li>
+    </ul>
+    <!--数据列表 -->
+    <div id="data_list" class="mt-20">
+        <div class="tab-pane active">
+            <table id="tablelist" class="table table-border table-bordered table-hover table-bg">
+                <thead>
+                <th data-field="code" data-valign="middle" data-align="center">面料编号
+                </th>
+                <th data-field="name" data-halign="left" data-valign="middle" data-align="left">面料名称
+                </th>
+                <th data-field="materielUuid" data-halign="left" data-valign="middle" data-align="left">面料分类
+                </th>
+                <th data-field="image" data-halign="left" data-valign="middle" data-align="left"
+                    data-formatter="imageFormatter">面料示意图
+                </th>
+                <th data-field="status" data-formatter="statusFormatter" data-halign="left" data-valign="middle"
+                    data-align="left">状态
+                </th>
+                <th data-field="component" data-halign="left" data-valign="middle" data-align="left">成分</th>
+                <th data-field="length" data-halign="left" data-valign="middle" data-align="left">幅宽</th>
+                <th data-field="weight" data-halign="left" data-valign="middle" data-align="left">克重</th>
+                <th data-field="color" data-halign="left" data-valign="middle" data-align="left"
+                    data-formatter="colorFormatter">颜色
+                </th>
+                <th data-field="action" data-formatter="actionFormatter" data-events="operateEvents"
+                    data-halign="center"
+                    data-valign="middle" data-align="center">操作
+                </th>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="../../js/base.js"></script>
+<script type="text/javascript" src="../../plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" src="../../plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script type="text/javascript" src="../../js/table.js"></script>
+<script type="text/javascript" src="../../plugins/My97DatePicker/4.8/WdatePicker.js"></script>
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    //初始化表格
+    var setting = {
+        tableId: '#tablelist',
+        url: zmme + "/material/page",
+        pagination: true,
+        pageSize: 10,
+        method: "post"
+    };
+    initTable(setting);
+    $(function () {
+        $("table thead th input:checkbox").on("click", function () {
+            $(this).closest("table").find("tr > td:first-child input:checkbox").prop("checked", $("table thead th input:checkbox").prop("checked"))
+        });
+        var vm = new Vue({
+            el: '#search',
+            data: {
+                model: {
+                    code: null,
+                    name: null,
+                    materielUuid: null,
+                    status: null
+                },
+                materiels: ''
+            },
+            created: function () {
+                axios.get(zmme + "/materielCategory/queryAll").then(function (response) {
+                    var result = response.data;
+                    if (result.code == 0)
+                        vm.materiels = result.data;
+                })
+            },
+            methods: {
+                search: function () {
+                    vm.model.beginDate = new Date($('#beginTime').val()).getTime();
+                    vm.model.endDate = new Date($('#endTime').val()).getTime();
+                    searchTable({tableId: '#tablelist', url: zmme + "/material/page"}, vm.model);
+                },
+                addFabric: function () {
+                    layer_full(2, "新增面料", "fabric_detail.html");
+                }
+            }
+
+        })
+        $('#myTab a:first').tab('show');
+        $('#myTab a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+            var status = e.target.attributes['status'].value;
+
+            var setting = {
+                tableId: '#tablelist',
+                url: zmme + '/material/page',
+            };
+            vm.model.status = status;
+            //查询数据
+            searchTable(setting, vm.model);
+        })
+
+    });
+    //添加操作按钮
+    function actionFormatter(value, row, index) {
+        var html = '<div>';
+        html += '<a title="查看"><i class="btn btnView glyphicon glyphicon-file"></i></a>';
+        html += '<a title="编辑"><i class="btn btnEdit glyphicon glyphicon-edit"></i></a>';
+        html += '<a title="删除"><i class="btn btnDelete glyphicon glyphicon-remove"></i></a>';
+        html += '</div>';
+        return [html].join('');
+    }
+
+    //注册按钮点击事件
+    window.operateEvents = {
+        'click .btnView': function (e, value, row, index) {
+            view(row);
+        },
+        'click .btnEdit': function (e, value, row, index) {
+            edit(row);
+        },
+        'click .btnDelete': function (e, value, row, index) {
+            del(row);
+        }
+    }
+
+    //查看
+    function view(row) {
+        layer_full(2, "查看面料详情", "fabric_detail.html?uuid=" + row.uuid + "&isEdit=false");
+    }
+
+    //编辑
+    function edit(row) {
+        layer_full(2, "编辑面料详情", "fabric_detail.html?uuid=" + row.uuid);
+    }
+
+    //删除
+    function del(row) {
+        swal({
+            title: "您确定要删除该面料吗",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "删除",
+            closeOnConfirm: false
+        }, function () {
+            axios.delete(zmme + "/material/deleteMaterial/" + row.uuid).then(function (response) {
+                var result = response.data;
+                if (result.code == 0) {
+                    swal({title: "删除成功！", text: "您已经成功删除了该面料。", type: "success"}, function () {
+                        refreshTable(setting.tableId);
+                    });
+                } else {
+                    swal("删除失败！", result.message, "error");
+                }
+            })
+        });
+    }
+
+    function statusFormatter(value, row, index) {
+        var div = "-";
+        if (value == '0') {
+            div = "待采样";
+        } else if (value == '1') {
+            div = "待仿真";
+        } else {
+            div = "已入库";
+        }
+        return div;
+    }
+
+    function imageFormatter(value, row, index) {
+        var div = "<div >";
+        value = JSON.parse(value);
+        for (var i = 0; i < value.length; i++) {
+            div += "<img src='" + value[i] + "' width='80px' style='vertical-align: middle;'/>"
+        }
+        div += "</div>"
+        return div;
+    }
+
+    function colorFormatter(value, row, index) {
+        var div = "<div >";
+        value = JSON.parse(value);
+        for (var i = 0; i < value.length; i++) {
+            div += '<span style="background:rgb' + value[i] + ';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;';
+        }
+        div += "</div>"
+        return div;
+    }
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+
+</html>

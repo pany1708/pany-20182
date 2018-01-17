@@ -1,0 +1,227 @@
+<!DOCTYPE HTML>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/h-ui/css/H-ui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/plugins/bootstrap-table/bootstrap-table.min.css"/>
+    <!-- Sweet Alert -->
+    <link rel="stylesheet" type="text/css" href="../../css/plugins/sweetalert/sweetalert.css"/>
+
+    <title>官方商品</title>
+</head>
+
+<body>
+
+<!--导航-->
+<nav class="breadcrumb"><i class="glyphicon glyphicon-home"></i> 首页 <span class="c-gray en">&gt;</span> 商品管理 <span
+        class="c-gray en">&gt;</span> 官方商品
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+       href="javascript:location.replace(location.href);"
+       title="刷新"><i class="glyphicon glyphicon-refresh"></i></a>
+</nav>
+<div class="page-container">
+    <!--操作按钮-->
+    <div class="text-c" id="search">
+        商品名称：<input type="text" placeholder="商品名称" style="width:250px" class="input-text" v-model="model.goodsName"/>
+        商品分类：
+        <span class="select-box inline"><!--zmme+'/classCategory/findNodes'-->
+		<select class="select" v-model="model.goodsCategoryType">
+			<option :value="null">全部</option>
+			<option :value="1">上衣</option>
+			<option :value="2">裤装</option>
+			<option :value="3">裙装</option>
+			<option :value="4">套装</option>
+		</select>
+		</span>
+        创建时间：
+        <input type="text" onfocus="WdatePicker({maxDate:'#F{$dp.$D(\'endTime\')||\'%y-%M-%d\'}'})"
+               class="input-text Wdate" style="width:120px;" id="beginTime"/>
+        -
+        <input type="text" onfocus="WdatePicker({minDate:'#F{$dp.$D(\'beginTime\')}'})"
+               class="input-text Wdate" style="width:120px;" id="endTime"/>
+        价格区间：
+        <input type="text" placeholder="价格" style="width:80px" class="input-text" v-model="model.priceMin"/>
+        -
+        <input type="text" placeholder="价格" style="width:80px" class="input-text" v-model="model.priceMax"/>
+        设计师：<input type="text" placeholder="设计师" style="width:250px" class="input-text" v-model="model.desinger"/>
+        <button class="btn btn-success" type="button" @click="search">搜索</button>
+        <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+           <a class="btn btn-sm btn-primary" data-title="添加分类" @click="to_add">
+               <i class="glyphicon glyphicon-plus"></i> 新增商品</a>
+        </span>
+        </div>
+    </div>
+
+    <!--数据列表-->
+    <div id="data_list" class="mt-20">
+        <table id="tablelist" class="table table-border table-bordered table-hover table-bg">
+            <thead>
+            <tr class="text-c">
+                <th data-field="uuid" data-width="25px" data-formatter="checkBoxFormatter" data-valign="middle"
+                    data-align="center"><input type="checkbox"/>全选
+                </th>
+                <th data-field="sn" data-halign="left" data-valign="middle" data-align="left">商品编号
+                </th>
+                <th data-field="goodsName" data-halign="left" data-valign="middle"
+                    data-align="left">商品名称
+                </th>
+                <th data-field="desinger" data-halign="left" data-valign="middle" data-align="left">设计师</th>
+                <th data-field="className" data-halign="left" data-valign="middle" data-align="left">商品分类</th>
+                <th data-field="standardPrice" data-halign="left" data-valign="middle" data-align="left">商品参考价</th>
+                <th data-field="createDate" data-halign="left" data-valign="middle" data-align="left">创建时间</th>
+                <th data-field="status" data-formatter="statusFormatter" data-halign="left" data-valign="middle"
+                    data-align="left">上架状态
+                </th>
+                <th data-field="action" data-formatter="actionFormatter" data-events="operateEvents"
+                    data-halign="center"
+                    data-valign="middle" data-align="center">操作
+                </th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script type="text/javascript" src="../../js/base.js"></script>
+<script type="text/javascript" src="../../plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" src="../../plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script type="text/javascript" src="../../js/table.js"></script>
+<script type="text/javascript" src="../../plugins/My97DatePicker/4.8/WdatePicker.js"></script>
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript">
+    $(function () {
+        $("table thead th input:checkbox").on("click", function () {
+            $(this).closest("table").find("tr > td:first-child input:checkbox").prop("checked", $("table thead th input:checkbox").prop("checked"))
+        });
+    })
+    var vm = new Vue({
+        el: '#search',
+        data: {
+            model: {
+                goodsName: null,
+                goodsCategoryType: null,
+                beginTime: null,
+                endTime: null,
+                priceMin: null,
+                priceMax: null,
+                desinger: null
+            }
+        },
+        methods: {
+            search: function () {
+                vm.model.beginTime = new Date($('#beginTime').val()).getTime();
+                vm.model.endTime = new Date($('#endTime').val()).getTime();
+                searchTable({tableId: '#tablelist', url: zmme + "/goods/officiallyList"}, vm.model);
+            },
+            to_add: function () {
+                layer_full(2, "添加商品", "goods_add.html");
+            }
+        }
+
+    })
+    //初始化表格
+    var setting = {
+        tableId: '#tablelist',
+        url: zmme + "/goods/officiallyList",
+        pagination: true,
+        pageSize: 10,
+        method: "post"
+    };
+    initTable(setting);
+    //添加操作按钮
+    function actionFormatter(value, row, index) {
+        var div = {title: "上架", status: "up"};
+        if (row.status) {
+            div.title = "下架";
+            div.status = "down";
+        }
+        var html = '<div>';
+        html += '<a title="查看"><i class="btn btnView glyphicon glyphicon-file"></i></a>';
+        html += '<a title=' + div.title + '><i class="btn btnUpOrDown glyphicon glyphicon-circle-arrow-' + div.status + '"></i></a>';
+        html += '<a title="编辑"><i class="btn btnEdit glyphicon glyphicon-edit"></i></a>';
+        html += '<a title="3D文件"><i class="btn btn3DFile glyphicon glyphicon-play-circle"></i></a>';
+        html += '</div>';
+        return [html].join('');
+    }
+
+    //注册按钮点击事件
+    window.operateEvents = {
+        'click .btnView': function (e, value, row, index) {
+            view(row);
+        },
+        'click .btnUpOrDown': function (e, value, row, index) {
+            upOrDown(row);
+        },
+        'click .btnEdit': function (e, value, row, index) {
+            edit(row);
+        },
+        'click .btn3DFile': function (e, value, row, index) {
+            link3DFile(row);
+        }
+    };
+    //查看
+    function view(row) {
+        layer_full(2, "主页商品详情", "goods_official_detail.html?uuid=" + row.uuid);
+    }
+
+    //编辑
+    function edit(row) {
+        layer_full(2, "主页商品详情", "goods_official_detail.html?uuid=" + row.uuid);
+    }
+
+    //上下架
+    function upOrDown(row) {
+        var operation = row.status ? "下架" : "上架";
+        swal({
+            title: "您确定要" + operation + "这件商品吗",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: operation,
+            closeOnConfirm: false
+        }, function () {
+            var param = {
+                array: [row.uuid],
+                goodsOperation: row.status ? "down" : "up"
+            };
+            axios.put(zmme + "/goods/upOrDownBatch", param).then(function (response) {
+                var result = response.data;
+                if (result.code == 0) {
+                    swal(operation + "成功！", "您已经成功" + operation + "了这件商品。", "success");
+                    refreshTable(setting.tableId);
+                } else {
+                    swal(operation + "失败！", result.message, "error");
+                }
+            })
+        });
+    }
+
+    function link3DFile(row) {
+        swal("链接3D文件", "", "info");
+    }
+
+    function statusFormatter(value, row, index) {
+        var div = "-";
+        if (value) {
+            div = "是";
+        } else {
+            div = "否";
+        }
+        return div;
+    }
+
+    function checkBoxFormatter(value, row, index) {
+        return "<input value='" + value + "' type='checkbox'>";
+    }
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+
+</html>
