@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.UserReportMapper">
+    <cache></cache>
+    <!--根据时间段查询全站注册用户数量-->
+    <select id="findRegisterUserNum" parameterType="com.kingthy.request.UserDataReq" resultType="int">
+        SELECT count(uuid) FROM member WHERE 1=1
+        <if test="timeRage !=null and timeRage.value == 1">
+            and TO_DAYS( NOW( ) ) - TO_DAYS( create_date) &lt;= 1;
+        </if>
+        <if test="timeRage !=null and timeRage.value == 2">
+            and DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= DATE(create_date);
+        </if>
+        <if test="timeRage !=null and timeRage.value == 3">
+            and DATE_SUB(CURDATE(), INTERVAL 15 DAY) &lt;= DATE(create_date);
+        </if>
+        <if test="timeRage !=null and timeRage.value == 4">
+            and PERIOD_DIFF( DATE_FORMAT( NOW( ) , '%Y%m' ) , DATE_FORMAT( create_date, '%Y%m' ) ) =1
+        </if>
+        <if test=" startDate != null and endDate != null">
+            and create_date BETWEEN #{startDate} AND DATE_ADD(#{endDate},INTERVAL 1 DAY);
+        </if>
+    </select>
+    <!--每日注册用户数-->
+    <select id="lastWeekNewUserNum" resultType="com.kingthy.dto.EverydayRegisterNumDto"
+            parameterType="com.kingthy.request.UserDataReq">
+        SELECT COUNT(`uuid`) AS `number`,DATE_FORMAT( create_date, '%Y-%m-%d' ) AS createDate
+        FROM member
+        GROUP BY DATE_FORMAT( create_date, '%Y%m%d' )
+        <if test="timeRage !=null and timeRage.value == 1">
+            HAVING TO_DAYS( NOW( ) ) - TO_DAYS( createDate) &lt;= 1;
+        </if>
+        <if test="timeRage !=null and timeRage.value == 2">
+            HAVING DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= DATE(createDate);
+        </if>
+        <if test="timeRage !=null and timeRage.value == 3">
+            HAVING DATE_SUB(CURDATE(), INTERVAL 15 DAY) &lt;= DATE(createDate);
+        </if>
+        <if test="timeRage !=null and timeRage.value == 4">
+            HAVING PERIOD_DIFF( DATE_FORMAT( NOW( ) , '%Y%m' ) , DATE_FORMAT( createDate, '%Y%m' ) ) =1
+        </if>
+        <if test=" startDate != null and endDate != null">
+            HAVING createDate BETWEEN #{startDate} AND DATE_ADD(#{endDate},INTERVAL 1 DAY);
+        </if>
+    </select>
+
+    <!--不同年龄分段购买情况-->
+    <select id="findUuidByAge" resultType="com.kingthy.dto.ReportUserUuidByAgeDto">
+        SELECT '小于17' AS age,m.`uuid` UUID FROM member m
+        WHERE TIMESTAMPDIFF(YEAR, m.birth, CURDATE()) &lt;= 17
+        UNION ALL
+        SELECT '18-23' AS age,m.`uuid` UUID  FROM member m
+        WHERE TIMESTAMPDIFF(YEAR, m.birth, CURDATE()) &lt;= 23
+        AND TIMESTAMPDIFF(YEAR, m.birth, CURDATE()) >=18
+        UNION ALL
+        SELECT '24-29'AS age,m.`uuid` UUID  FROM member m
+        WHERE TIMESTAMPDIFF(YEAR, m.birth, CURDATE()) &lt;= 29
+        AND TIMESTAMPDIFF(YEAR, m.birth, CURDATE())>=24
+        UNION ALL
+        SELECT '30-39'AS age,m.`uuid` UUID  FROM member m
+        WHERE TIMESTAMPDIFF(YEAR, m.birth, CURDATE()) &lt;= 30
+        AND TIMESTAMPDIFF(YEAR, m.birth, CURDATE())>=39
+        UNION ALL
+        SELECT '40-50' AS age,m.`uuid` UUID  FROM member m
+        WHERE TIMESTAMPDIFF(YEAR, m.birth, CURDATE()) &lt;= 50
+        AND TIMESTAMPDIFF(YEAR, m.birth, CURDATE())>= 40
+        UNION ALL
+        SELECT '51-60' AS age,m.`uuid` UUID  FROM member m
+        WHERE TIMESTAMPDIFF(YEAR, m.birth, CURDATE()) &lt;= 60
+        AND TIMESTAMPDIFF(YEAR, m.birth, CURDATE())>= 51
+        UNION ALL
+        SELECT '大于60' AS age,m.`uuid` UUID  FROM member m
+        WHERE TIMESTAMPDIFF(YEAR, m.birth, CURDATE())> 60
+    </select>
+</mapper>

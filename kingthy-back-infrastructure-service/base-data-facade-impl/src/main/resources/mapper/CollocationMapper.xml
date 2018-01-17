@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.CollocationMapper">
+    <cache/>
+    <select id="findByPage" resultType="com.kingthy.entity.Collocation" parameterType="com.kingthy.entity.Collocation">
+        SELECT id,create_date createDate,modify_date modifyDate,version,creator,modifier,uuid,
+        temperature_uuid temperatureUuid,occasion_uuid occasionUuid,colour_uuid colourUuid,style_uuid styleUuid,
+        index_image indexImage,goodslist,description
+        FROM collocation
+        WHERE del_flag IS FALSE
+        <if test=" colourUuid !=null and colourUuid!='' ">
+            AND colour_uuid = #{colourUuid}
+        </if>
+        <if test=" occasionUuid !=null and occasionUuid!='' ">
+            AND occasion_uuid = #{occasionUuid}
+        </if>
+        <if test=" styleUuid !=null and styleUuid!='' ">
+            AND style_uuid = #{styleUuid}
+        </if>
+        <if test=" temperatureUuid !=null and temperatureUuid!='' ">
+            AND temperature_uuid = #{temperatureUuid}
+        </if>
+        ORDER BY create_date DESC
+    </select>
+
+    <select id="findByPage_COUNT" resultType="java.lang.Long">
+        SELECT count(uuid)
+        FROM collocation
+        WHERE del_flag IS FALSE
+        <if test=" colourUuid !=null and colourUuid!='' ">
+            AND colour_uuid = #{colourUuid}
+        </if>
+        <if test=" occasionUuid !=null and occasionUuid!='' ">
+            AND occasion_uuid = #{occasionUuid}
+        </if>
+        <if test=" styleUuid !=null and styleUuid!='' ">
+            AND style_uuid = #{styleUuid}
+        </if>
+        <if test=" temperatureUuid !=null and temperatureUuid!='' ">
+            AND temperature_uuid = #{temperatureUuid}
+        </if>
+    </select>
+</mapper>

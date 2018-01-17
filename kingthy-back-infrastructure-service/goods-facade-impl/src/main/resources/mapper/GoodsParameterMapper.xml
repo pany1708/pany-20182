@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.GoodsParameterMapper" >
+
+	  <select id="selectCountByParameterIds" resultType="com.kingthy.dto.GoodsParameterCountDTO">
+		  select paramenter_uuid paramenterUuid, count(*) count
+		  from goods_parameter
+		  where paramenter_uuid in
+		  <foreach collection="list" item="item" open="(" separator="," close=")" >
+			  #{item}
+		  </foreach>
+          group by paramenter_uuid;
+	  </select>
+</mapper>

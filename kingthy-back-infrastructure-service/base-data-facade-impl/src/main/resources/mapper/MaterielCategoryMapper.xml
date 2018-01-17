@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.MaterielCategoryMapper" >
+  <resultMap id="BaseResultMap" type="com.kingthy.entity.MaterielCategory" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+    <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+    <result column="uuid" property="uuid" jdbcType="CHAR" />
+    <result column="parent_id" property="parentId" jdbcType="CHAR" />
+    <result column="class_name" property="className" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="BIT" />
+    <result column="orders" property="orders" jdbcType="INTEGER" />
+    <result column="grade" property="grade" jdbcType="INTEGER" />
+    <result column="tree_path" property="treePath" jdbcType="VARCHAR" />
+    <result column="goods_num" property="goodsNum" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="short_en_name" property="shortEnName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, create_date, modify_date, version, creator, modifier, uuid, parent_id, class_name, 
+    status, description, del_flag, orders, grade, tree_path, goods_num,type,short_en_name
+  </sql>
+
+  <!--批量更新-->
+  <update id="batchUpdateGoodsNum" >
+
+    UPDATE materiel_category
+    <trim prefix="set" suffixOverrides=",">
+      <trim prefix=" goods_num = case" suffix="end,">
+        <foreach collection="list" item="item" index="index">
+          when uuid = #{item.paramenterUuid} then  #{item.count}
+        </foreach>
+      </trim>
+    </trim>
+    WHERE
+    <foreach collection="list" separator="or" item="item" index="index">
+      uuid= #{item.paramenterUuid}
+    </foreach>
+  </update>
+
+  <select id="findMaterielNameByMaterielUuid" resultType="com.kingthy.dto.MaterieDto">
+    SELECT uuid,class_name name from materiel_category
+    WHERE uuid IN
+      <foreach collection="list" index="" separator="," item="uuid" open="(" close=")">
+        #{uuid}
+      </foreach>
+  </select>
+
+  <select id="findByPage" parameterType="com.kingthy.entity.MaterielCategory" resultMap="BaseResultMap" >
+    SELECT id, create_date, modify_date, version, creator, modifier, uuid, parent_id, class_name,
+    status, description, orders, grade, tree_path, goods_num,type,short_en_name
+    FROM materiel_category
+    WHERE del_flag IS FALSE
+    <if test=" className !=null and className!='' ">
+      AND class_name LIKE concat('%',#{className},'%')
+    </if>
+    ORDER BY create_date DESC
+  </select>
+
+  <select id="findByPage_COUNT" resultType="Long">
+    SELECT COUNT(uuid)
+    FROM materiel_category
+    WHERE del_flag IS FALSE
+    <if test=" className !=null and className!='' ">
+      AND class_name LIKE concat('%',#{className},'%')
+    </if>
+  </select>
+
+  <select id="selectAllUuid" resultType="com.kingthy.entity.MaterielCategory">
+    SELECT uuid FROM
+    materiel_category
+    WHERE del_flag IS FALSE
+  </select>
+
+  <select id="selectByUuid" parameterType="java.lang.String" resultMap="BaseResultMap" >
+    SELECT create_date, modify_date, version,uuid, parent_id, class_name,
+    status, description, orders, grade, tree_path, goods_num,type,short_en_name
+    FROM materiel_category
+    WHERE del_flag IS FALSE
+    AND uuid =#{uuid}
+  </select>
+</mapper>

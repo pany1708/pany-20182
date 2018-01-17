@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.MemberWithdrawsCashMapper" >
+  <resultMap id="BaseResultMap" type="com.kingthy.entity.MemberWithdrawsCash" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uuid" property="uuid" jdbcType="CHAR" />
+    <result column="members_uuid" property="membersUuid" jdbcType="CHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+    <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="BIT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="bank_card_uuid" property="bankCardUuid" jdbcType="CHAR" />
+    <result column="money" property="money" jdbcType="DECIMAL" />
+    <result column="card_no" property="cardNo" jdbcType="VARCHAR" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+  </resultMap>
+
+    <update id="updateStatusSuccess">
+        UPDATE member_withdraws_cash a
+        SET a.`status` = 2,
+        a.modify_date = NOW(),
+        a.version = a.version + 1
+        WHERE
+        a.uuid IN
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND a.del_flag = 0
+    </update>
+
+    <select id="selectWithdrawsCashListByStatus" resultMap="BaseResultMap" parameterType="java.lang.String">
+      SELECT * FROM member_withdraws_cash a WHERE a.del_flag = 0 AND `status` = 1 AND order_id IS NOT NULL
+    </select>
+
+  <select id="queryMemberWithdrawsCashByUuid" parameterType="java.lang.String" resultMap="BaseResultMap">
+     SELECT * FROM member_withdraws_cash WHERE del_flag = 0 AND uuid = #{uuid}
+  </select>
+
+  <select id="selectWithdrawsCashList" resultType="com.kingthy.dto.WithDrawsCashDTO">
+    SELECT
+	a.money,
+	a.create_date createDate,
+	a.`status`
+    FROM
+        member_withdraws_cash a
+    WHERE
+        a.del_flag = 0
+        AND a.members_uuid = #{membersUuid}
+    ORDER BY
+        a.create_date DESC
+    LIMIT #{offset}, #{pageSize}
+  </select>
+
+
+
+
+    <select id="queryWithdraws" resultType="java.math.BigDecimal" parameterType="java.lang.String">
+        SELECT SUM(c.money) withdraws FROM member_withdraws_cash c WHERE c.members_uuid = #{membersUuid} AND c.del_flag = 0
+   </select>
+
+
+    <update id="updateStatusAndOrderId" parameterType="com.kingthy.request.UpdateWithDrawStatusReq">
+    UPDATE member_withdraws_cash a
+    SET a.`status` = #{status},
+     a.modify_date = NOW(),
+     a.modifier = #{memberUuid},
+     a.order_id = #{orderId},
+     a.version = a.version + 1
+    WHERE
+        a.uuid = #{withdrawsUuid}
+    AND a.del_flag = 0
+    AND a.members_uuid = #{memberUuid}
+    AND a.version = ${version}
+  </update>
+
+</mapper>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.GoodsReportMapper" >
+
+
+    <select id="findGoodsDataByDataType" parameterType="com.kingthy.request.ReportGoodsDataReq"
+            resultType="int">
+        SELECT COUNT(UUID)  FROM goods WHERE del_flag = 0
+        <choose>
+            <when test="dataType.value == 0 ">
+                <if test="timeRage !=null and timeRage.value == 1">
+                    and TO_DAYS( NOW( ) ) - TO_DAYS( create_date) &lt;= 1;
+                </if>
+                <if test="timeRage !=null and timeRage.value == 2">
+                    and DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= DATE(create_date);
+                </if>
+                <if test="timeRage !=null and timeRage.value == 3">
+                    and DATE_SUB(CURDATE(), INTERVAL 15 DAY) &lt;= DATE(create_date);
+                </if>
+                <if test="timeRage !=null and timeRage.value == 4">
+                    and PERIOD_DIFF( DATE_FORMAT( NOW( ) , '%Y%m' ) , DATE_FORMAT( create_date, '%Y%m' ) ) =1
+                </if>
+            </when>
+            <otherwise>
+                and goods_category_type = #{dataType.value}
+                <if test="timeRage !=null and timeRage.value == 1">
+                    and TO_DAYS( NOW( ) ) - TO_DAYS( create_date) &lt;= 1;
+                </if>
+                <if test="timeRage !=null and timeRage.value == 2">
+                    and DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= DATE(create_date);
+                </if>
+                <if test="timeRage !=null and timeRage.value == 3">
+                    and DATE_SUB(CURDATE(), INTERVAL 15 DAY) &lt;= DATE(create_date);
+                </if>
+                <if test="timeRage !=null and timeRage.value == 4">
+                    and PERIOD_DIFF( DATE_FORMAT( NOW( ) , '%Y%m' ) , DATE_FORMAT( create_date, '%Y%m' ) ) =1
+                </if>
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--上架商品价格分布-->
+  <select id="findNumByPriceRange" resultType="com.kingthy.dto.GoodsPriceRangeNumDto">
+      SELECT COUNT(UUID) AS num,'0~1000' AS priceRange FROM goods WHERE standard_price &lt;=1000 AND  STATUS=1
+      UNION ALL
+      SELECT COUNT(UUID) AS num,'1001~3000' AS priceRange FROM goods WHERE standard_price &gt;=1001 AND standard_price &lt;=3000 AND  STATUS=1
+      UNION ALL
+      SELECT COUNT(UUID) AS num,'3001~5000' AS priceRange FROM goods WHERE standard_price  &gt;=3001 AND standard_price &lt;=5000 AND  STATUS=1
+      UNION ALL
+      SELECT COUNT(UUID) AS num,'5001~8000' AS priceRange FROM goods WHERE standard_price  &gt;=5001 AND standard_price &lt;=8000 AND  STATUS=1
+      UNION ALL
+      SELECT COUNT(UUID) AS num,'8001~10000' AS priceRange FROM goods WHERE standard_price  &gt;=8001 AND standard_price &lt;=10000 AND  STATUS=1
+      UNION ALL
+      SELECT COUNT(UUID) AS num,'10000以上' AS priceRange FROM goods WHERE standard_price  &gt;10000 AND  STATUS=1
+  </select>
+</mapper>

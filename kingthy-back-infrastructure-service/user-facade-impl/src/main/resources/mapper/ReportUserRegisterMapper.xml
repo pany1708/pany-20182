@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.ReportUserRegisterMapper">
+    <cache></cache>
+    <resultMap id="BaseResultMap" type="com.kingthy.entity.ReportUserRegister">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="uuid" property="uuid" jdbcType="CHAR"/>
+        <result column="creator" property="creator" jdbcType="VARCHAR"/>
+        <result column="modifier" property="modifier" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP"/>
+        <result column="del_flag" property="delFlag" jdbcType="BIT"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="BIT"/>
+        <result column="number" property="number" jdbcType="INTEGER"/>
+        <result column="register_date" property="registerDate" jdbcType="DATE"/>
+    </resultMap>
+
+
+    <select id="userRegisterReport" resultType="com.kingthy.dto.UserRegisterReportDto">
+    SELECT number,create_date AS refreshTime,register_date AS registerDate FROM report_user_register
+  </select>
+    <delete id="deleteAll">
+    DELETE FROM report_user_register;
+  </delete>
+</mapper>

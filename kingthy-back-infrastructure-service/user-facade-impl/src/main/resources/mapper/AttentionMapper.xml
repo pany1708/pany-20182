@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kingthy.mapper.AttentionMapper">
+	<cache></cache>
+	<!-- 实体字段映射 -->
+	<resultMap id="attention" type="com.kingthy.entity.Attention">
+		<result column="member_uuid" property="memberUuid" />
+		<result column="attention_uuid" property="attentionUuid" />
+		<result column="create_date" property="createDate" />
+		<result column="modify_date" property="modifyDate" />
+	</resultMap>
+
+	<!-- 分页 -->
+	<sql id="page_Common">
+		<if test=" pageIndex!=null">
+			<if test=" pageSize!=null">
+				LIMIT #{pageIndex},#{pageSize}
+			</if>
+		</if>
+	</sql>
+
+
+	<!-- 获取我关注的用户 -->
+	<select id="getAttentionMemberList" resultType="com.kingthy.dto.AttentionMemberDTO">
+
+		select
+		a.attention_uuid memberUuid,
+		c.count fansCount,
+		(case when (select count(1) from  attention where attention_uuid=#{memberUuid} and member_uuid=a.attention_uuid)>0 then true else false end ) isMutualAttention
+		from attention a
+		left join
+		(select attention_uuid,count(attention_uuid) count
+		from attention group by attention_uuid) c on a.attention_uuid=c.attention_uuid
+		where a.member_uuid=#{memberUuid}
+		order by a.id
+
+
+	</select>
+
+    <!-- 获取粉丝列表 -->
+	<select id="getFansLilst" resultType="com.kingthy.dto.FansDTO">
+		select
+		uuid memberUuid,
+		nick_name nickName,
+		user_name userName,
+		head_image headImage
+		from member
+		<where>
+			<if test="list != null  and list.size()>0 ">
+				and uuid in
+				<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+
+		order by id
+	</select>
+
+
+
+
+	<select id="getAttentionCount" resultType="int">
+		select count(1) from attention
+		<where>
+			<if test=" memberUuid!=null and memberUuid!='' ">
+				and member_uuid=#{memberUuid}
+			</if>
+			<if test=" attentionUuid!=null and attentionUuid!='' ">
+				and attention_uuid=#{attentionUuid}
+			</if>
+		</where>
+	</select>
+
+	<!-- 批量删除我的关注 -->
+	<delete id="batchDeleteAttention">
+		delete from attention where member_uuid=#{memberUuid} and
+		attention_uuid in (
+		<foreach collection="attentionUuids" item="uuid" separator=",">
+			#{uuid}
+		</foreach>
+		)
+	</delete>
+
+	<select id="isattention" resultType="java.lang.String" parameterType="java.util.Map">
+		 SELECT a.`attention_uuid`
+		 FROM attention a
+		 WHERE a.member_uuid = #{queryMemberUuid}
+         AND a.attention_uuid IN
+         <foreach collection="momentDtoList" index="index" separator="," item="momentDto" open="(" close=")">
+			 #{momentDto.memberUuid}
+		 </foreach>
+	</select>
+
+	<select id="selectFansUuidList" resultType="java.lang.String">
+		select  DISTINCT member_uuid  from attention where attention_uuid=#{attentionUuid}
+	</select>
+</mapper>

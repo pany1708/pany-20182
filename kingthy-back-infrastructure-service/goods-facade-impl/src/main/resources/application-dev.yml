@@ -1,0 +1,52 @@
+server.port:   ${dev.server.port:7300}
+#server:
+#  ssl:
+#    key-store: classpath:keystore.p12
+#    key-store-password: 123456
+#    keyStoreType: PKCS12
+#    keyAlias: tomcat
+spring:
+  datasource: 
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://192.168.7.193:8066/zmshop_goods?characterEncoding=UTF-8
+    username: ${dev.spring.datasource.username:root}
+    password: $RFV5tgb
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari: 
+      connection-test-query: ${dev.spring.datasource.hikari.connection-test-query:select user()}
+      connection-timeout: ${dev.spring.datasource.hikari.connection-timeout:30000}
+      idle-timeout: ${dev.spring.datasource.hikari.idle-timeout:60000}
+      max-lifetime: ${dev.spring.datasource.hikari.max-lifetime:1800000}
+      maximum-pool-size: ${dev.spring.datasource.hikari.maximum-pool-size:100}
+      minimum-idle: ${dev.spring.datasource.hikari.minimum-idle:10}
+  application:
+    name: ${test.spring.application.name:dubbo-provider-goods}
+  redis:
+         database: ${dev.spring.redis.database:1}
+         host: ${dev.spring.redis.host:192.168.1.225}
+         port: ${dev.spring.redis.port:6379}
+         password: ${dev.spring.redis.password:myredis}
+         timeout: ${dev.spring.redis.timeout:0}
+         pool:
+             max-active: ${dev.spring.redis.pool.max-active:20}
+             min-idle: ${dev.spring.redis.pool.min-idle:5}
+             max-idle: ${dev.spring.redis.pool.max-idle:10}
+             max-wait: ${dev.spring.redis.pool.max-wait:-1}
+  rabbitmq:
+    host: ${dev.rabbitmq.host:192.168.1.148}
+    port: ${dev.rabbitmq.port:5672}
+    username: ${dev.rabbitmq.username:admin}
+    password: ${dev.rabbitmq.password:Jxkj2016}
+
+  #dubbo配置
+  dubbo:
+    application.name: ${dev.dubbo.application.name:goods-facade-impl}
+    registry.address: ${dev.dubbo.registry.address:zookeeper://localhost:2181}
+    protocol.name: ${dev.dubbo.protocol.name:dubbo}
+    protocol.port: ${dev.dubbo.protocol.prot:20883}
+    scan: ${dev.dubbo.registry.scan:com.kingthy.dubbo.service.impl}
+
+logging:
+  level:
+    com.kingthy.service.impl: DEBUG      
+     

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.AccessoriesImagesMapper">
+
+    <select id="queryUUidByMaterialUuid" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT uuid FROM accessories_images s WHERE s.accessories_uuid = #{accessoriesUuid} AND s.del_flag IS FALSE ORDER BY s.create_date
+
+    </select>
+
+    <select id="delImagesByAccessoriesUuid" resultType="java.lang.Integer" parameterType="java.lang.String">
+        UPDATE accessories_images SET del_flag = 1,modify_date = NOW() WHERE accessories_uuid = #{materialUuid} AND del_flag IS FALSE
+    </select>
+</mapper>

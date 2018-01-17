@@ -1,0 +1,46 @@
+server.port:   ${dev.server.port:7999}
+#server:
+#  ssl:
+#    key-store: classpath:keystore.p12
+#    key-store-password: 123456
+#    keyStoreType: PKCS12
+#    keyAlias: tomcat
+spring:
+  datasource:
+      type: com.zaxxer.hikari.HikariDataSource
+      #type: com.alibaba.druid.pool.DruidDataSource
+      #${dev.spring.datasource.url}
+      url: jdbc:mysql://192.168.7.193:8066/zmshop_user?characterEncoding=UTF-8
+      #
+      username: root
+      #${dev.spring.datasource.password}
+      password: $RFV5tgb
+      driver-class-name: com.mysql.jdbc.Driver
+      hikari:
+        connection-test-query: ${test.spring.datasource.hikari.connection-test-query:select user()}
+        #最大连接超时，默认30S
+        connection-timeout: ${test.spring.datasource.hikari.connection-timeout:30000}
+        #最大空闲超时，默认10分钟
+        idle-timeout: ${test.spring.datasource.hikari.idle-timeout:60000}
+        #连接池中一个连接的最大生命周期，缺省30分钟，建议设置比数据库的超时时长少30S以上
+        max-lifetime: ${test.spring.datasource.hikari.max-lifetime:1800000}
+        #连接池中，最大连接数，默认10
+        maximum-pool-size: ${test.spring.datasource.hikari.maximum-pool-size:100}
+        minimum-idle: ${test.spring.datasource.hikari.minimum-idle:10}
+
+  application:
+    name: ${dev.spring.application.name:dubbo-provider-user}
+
+  #dubbo配置
+  dubbo:
+    application.name: user-facade-impl
+    registry.address: zookeeper://localhost:2181
+    protocol.name:  dubbo
+    protocol.port:  20890
+    scan: com.kingthy.dubbo.service.impl
+
+logging:
+  level:
+    com.kingthy.dubbo.service.impl: info
+    com.kingthy.mapper: info
+     

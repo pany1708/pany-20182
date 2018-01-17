@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.MemberMapper">
+    <cache></cache>
+    <resultMap id="BaseResultMap" type="com.kingthy.entity.Member">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="uuid" property="uuid" jdbcType="CHAR"/>
+        <result column="del_flag" property="delFlag" jdbcType="BIT"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP"/>
+        <result column="creator" property="creator" jdbcType="VARCHAR"/>
+        <result column="modifier" property="modifier" jdbcType="VARCHAR"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="pass_word" property="passWord" jdbcType="VARCHAR"/>
+        <result column="payment_password" property="paymentPassword" jdbcType="VARCHAR"/>
+        <result column="paymen_salt" property="paymenSalt" jdbcType="VARCHAR"/>
+        <result column="salt" property="salt" jdbcType="VARCHAR"/>
+        <result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+        <result column="gender" property="gender" jdbcType="INTEGER"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="area_ids" property="areaIds" jdbcType="CHAR"/>
+        <result column="area_name" property="areaName" jdbcType="VARCHAR"/>
+        <result column="birth" property="birth" jdbcType="TIMESTAMP"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="zip_code" property="zipCode" jdbcType="VARCHAR"/>
+        <result column="locked_date" property="lockedDate" jdbcType="TIMESTAMP"/>
+        <result column="login_date" property="loginDate" jdbcType="TIMESTAMP"/>
+        <result column="login_failure_count" property="loginFailureCount" jdbcType="INTEGER"/>
+        <result column="login_ip" property="loginIp" jdbcType="VARCHAR"/>
+        <result column="login_plugin_id" property="loginPluginId" jdbcType="VARCHAR"/>
+        <result column="integral" property="integral" jdbcType="INTEGER"/>
+        <result column="register_ip" property="registerIp" jdbcType="VARCHAR"/>
+        <result column="is_enabled" property="isEnabled" jdbcType="BIT"/>
+        <result column="is_locked" property="isLocked" jdbcType="BIT"/>
+        <result column="is_desinger" property="isDesinger" jdbcType="BIT"/>
+        <result column="token" property="token" jdbcType="VARCHAR"/>
+        <result column="last_login_date" property="lastLoginDate" jdbcType="TIMESTAMP"/>
+        <result column="head_image" property="headImage" jdbcType="VARCHAR"/>
+        <result column="bar_codes" property="barCodes" jdbcType="VARCHAR"/>
+        <result column="constellation" property="constellation" jdbcType="VARCHAR"/>
+        <result column="occupation" property="occupation" jdbcType="VARCHAR"/>
+        <result column="style" property="style" jdbcType="VARCHAR"/>
+        <result column="skin_color" property="skinColor" jdbcType="VARCHAR"/>
+        <result column="face" property="face" jdbcType="VARCHAR"/>
+        <result column="signature" property="signature" jdbcType="VARCHAR"/>
+        <result column="job" property="job" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 获取首页展示的数据 -->
+    <select id="getHomeInfo" resultType="com.kingthy.dto.MemberHomeDTO">
+        select a.uuid  memberUuid,a.nick_name nickName,user_name userName,a.head_image headImage
+        from member a
+        where a.uuid=#{memberUuid}
+    </select>
+
+    <!-- 修改昵称 -->
+    <update id="updateName">
+        update member set user_name=#{name} where uuid=#{uuid}
+    </update>
+
+
+    <!-- 检查昵称是否存在  -->
+    <select id="checkNameIsExist" resultType="java.lang.Integer">
+        select count(*) from member where user_name=#{name} and uuid!=#{uuid}
+    </select>
+
+    <!-- 编辑签名 -->
+    <update id="updateSignature">
+        update member set signature=#{signature} where uuid=#{uuid}
+    </update>
+
+    <update id="updateMemberLoginInfo">
+        update member
+        <trim prefix="set" suffixOverrides=",">
+
+            <if test=" token !=null and token!='' ">
+                token= #{token},
+            </if>
+            <if test=" loginFailureCount !=null  ">
+                login_failure_count= #{loginFailureCount},
+            </if>
+            <if test=" lastLoginDate !=null  ">
+                last_login_date= #{lastLoginDate},
+            </if>
+
+            <if test=" isLocked !=null  ">
+                is_locked= #{isLocked},
+            </if>
+            <if test=" lockedDate !=null  ">
+                locked_date= #{lockedDate},
+            </if>
+
+        </trim>
+        where phone=#{phone}
+    </update>
+
+    <select id="getMemberByUuid" resultType="com.kingthy.dto.MemberDTO">
+        select uuid, user_name
+        userName,nick_name nickName,address,
+        if(ISNULL(payment_password),false,true) isSetPaymentPwd,
+        area_ids areaIds,area_name areaName,birth,email,phone,is_desinger isDesinger,
+        head_image headImage,occupation,style,skin_color skinColor,face,
+        signature,job
+        from member where uuid=#{uuid}
+    </select>
+
+    <select id="checkPhoneIsExist" resultType="java.lang.Integer">
+        select count(1) from member where phone=#{phone} and uuid!=#{uuid}
+    </select>
+
+    <update id="modifyPhone">
+        update member set phone=#{phone} where uuid=#{uuid}
+    </update>
+    <update id="modifyPassword">
+        update member set pass_word=#{password},salt=#{salt} where uuid=#{uuid}
+    </update>
+    <update id="modifyPaymentPassword">
+        update member set payment_password=#{paymentPassword},paymen_salt=#{paymenSalt} where uuid=#{uuid}
+    </update>
+
+    <update id="updateLocked">
+        UPDATE member a SET a.is_locked = 0, a.modify_date = NOW() WHERE a.phone = #{phone}
+    </update>
+
+    <!--根据memberUuid批量查询userName和headImage-->
+    <select id="findMemberInfoByList" resultType="com.kingthy.dto.CommentMemberDto">
+        SELECT user_name AS memberName,head_image AS icon, uuid AS memberUuid
+        FROM member m WHERE uuid in
+        <foreach collection="list" open="(" close=")" item="buyersShowDTO" separator="," index="index">
+            #{buyersShowDTO.memberUuid}
+        </foreach>
+
+    </select>
+
+    <select id="selectDesignerInfoByDesignerUuid" parameterType="java.lang.String"
+            resultType="com.kingthy.dto.GoodsDTO$DesignerInfo">
+        SELECT
+        b.uuid designerUuid,
+        b.user_name designerName,
+        b.head_image icon,
+        (a.id IS NOT NULL) follow
+        FROM
+        member b
+        LEFT JOIN attention a ON a.member_uuid = #{memberUuid}
+        AND a.attention_uuid = b.uuid
+        WHERE
+        b.uuid = #{designerUuid}
+        AND b.del_flag = 0
+    </select>
+
+    <select id="findMemberByPage" parameterType="com.kingthy.request.MemberPageReq" resultMap="BaseResultMap">
+        SELECT uuid,phone,user_name,gender,birth,create_date,is_enabled FROM
+        member
+        WHERE del_flag IS FALSE
+        <if test="phone!=null">
+            AND phone LIKE concat('%',#{phone},'%')
+        </if>
+        <if test="userName!=null">
+            AND user_name LIKE concat('%',#{userName},'%')
+        </if>
+        <if test="startTime !=null">
+            <![CDATA[ AND create_date  >=  #{startTime}  ]]>
+        </if>
+        <if test="endTime !=null ">
+            <![CDATA[ AND create_date <=  #{endTime}  ]]>
+        </if>
+    </select>
+
+    <!-- 改变用户冻结状态 -->
+    <update id="changeIsEnableBatch" parameterType="java.util.Map">
+        update member set
+        is_enabled = #{isEnabled},
+        modify_date = #{modifyDate},
+        locked_date = #{modifyDate}
+        where uuid in
+        <foreach collection="uuidArray" item="memberUuid" index="" open="(" close=")" separator=",">
+            #{memberUuid}
+        </foreach>
+    </update>
+
+    <select id="selectMemberUuidsByName" resultType="java.lang.String">
+        select DISTINCT uuid from member where user_name like concat('%',#{userName},'%')
+    </select>
+
+    <select id="selectMemberListByUuids" resultType="com.kingthy.entity.Member">
+        select
+        id,
+        uuid,
+        user_name userName,
+        nick_name nickName,
+        phone,
+        head_image headImage
+        from member where uuid in
+        <foreach collection="list" item="uuid" index="" open="(" close=")" separator=",">
+            #{uuid}
+        </foreach>
+    </select>
+
+    <select id="getMembersBaseInfo" resultType="com.kingthy.dto.MemberBaseInfoDTO">
+        select
+        uuid,
+        nick_name nickName,
+        head_image headImage
+        from member where uuid in
+        <foreach collection="list" item="uuid" index="" open="(" close=")" separator=",">
+            #{uuid}
+        </foreach>
+    </select>
+
+</mapper>

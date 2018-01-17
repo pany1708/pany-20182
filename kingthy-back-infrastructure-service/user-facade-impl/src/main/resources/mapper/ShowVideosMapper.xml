@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.ShowVideosMapper" >
+    <cache></cache>
+    <select id="query" parameterType="com.kingthy.entity.ShowVideos" resultType="com.kingthy.entity.ShowVideos">
+        select uuid,member_uuid memberUuid,`name`,video_url videoUrl,del_flag delFlag from show_videos
+        <where>
+            <if test="null != memberUuid and '' != memberUuid">
+                member_uuid = #{memberUuid}
+            </if>
+            <if test="null != delFlag">
+                AND del_flag = #{delFlag}
+            </if>
+        </where>
+    </select>
+</mapper>

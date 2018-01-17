@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.OpusMapper" >
+
+    <resultMap id="BaseResultMap" type="com.kingthy.entity.Opus" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+        <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP" />
+        <result column="version" property="version" jdbcType="INTEGER" />
+        <result column="opus_name" property="opusName" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="sn" property="sn" jdbcType="VARCHAR" />
+        <result column="modle_path" property="modlePath" jdbcType="VARCHAR" />
+        <result column="opus_status" property="opusStatus" jdbcType="INTEGER" />
+        <result column="is_show" property="isShow" jdbcType="BIT" />
+        <result column="del_flag" property="delFlag" jdbcType="BIT" />
+        <result column="uuid" property="uuid" jdbcType="CHAR" />
+        <result column="member_uuid" property="memberUuid" jdbcType="CHAR" />
+        <result column="creator" property="creator" jdbcType="VARCHAR" />
+        <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+        <result column="opus_material_info" property="opusMaterialInfo" jdbcType="VARCHAR" />
+        <result column="opus_parts_info" property="opusPartsInfo" jdbcType="VARCHAR" />
+        <result column="opus_accessories_info" property="opusAccessoriesInfo" jdbcType="VARCHAR" />
+        <result column="member_nick" property="memberNick" jdbcType="VARCHAR" />
+        <result column="season" property="season" jdbcType="VARCHAR" />
+        <result column="class_category_type" property="classCategoryType" jdbcType="VARCHAR" />
+        <result column="class_category_name" property="classCategoryName" jdbcType="VARCHAR" />
+        <result column="standard_price" property="standardPrice" jdbcType="DECIMAL" />
+        <result column="opus_image" property="opusImage" jdbcType="LONGVARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, create_date, modify_date, version, opus_name, remark, sn, modle_path, opus_status,
+        is_show, del_flag, uuid, member_uuid, creator, modifier, opus_material_info, opus_parts_info,
+        opus_accessories_info, member_nick, season, class_category_type, class_category_name,
+        standard_price,opus_image
+    </sql>
+    <select id="findNumByDesignerUuid" parameterType="java.lang.String" resultType="java.lang.Long">
+         SELECT
+           COUNT(1)
+           FROM
+           opus c
+           WHERE
+           c.member_uuid = #{designerUuid}
+           AND c.opus_status = 1
+           AND c.del_flag = 0
+    </select>
+
+    <select id="findByPage" parameterType="com.kingthy.request.OpusSearchReq" resultType="com.kingthy.entity.Opus">
+      SELECT sn,opus_name opusName,opus_status opusStatus,remark,member_nick memberNick,
+        create_date createDate,uuid,is_show isShow
+      FROM opus
+      WHERE del_flag is FALSE
+      <if test=" opusName !=null and opusName !='' ">
+          AND opus_name LIKE concat('%',#{opusName},'%')
+      </if>
+        <if test=" memberNick != null and memberNick !='' ">
+            AND member_nick LIKE concat('%',#{memberNick},'%')
+        </if>
+        <if test=" remark !=null and remark !='' ">
+            AND remark LIKE concat('%',#{remark},'%')
+        </if>
+      <if test="opusStatus!=null">
+          AND opus_status = #{opusStatus}
+      </if>
+        <if test="beginDate !=null">
+            <![CDATA[ AND create_date  >=  #{beginDate}  ]]>
+        </if>
+        <if test="endDate !=null "  >
+            <![CDATA[ AND create_date <=  #{endDate}  ]]>
+        </if>
+        ORDER BY create_date DESC
+    </select>
+
+    <select id="findByPage_COUNT" parameterType="com.kingthy.request.OpusSearchReq" resultType="java.lang.Long">
+        SELECT COUNT(uuid)
+        FROM opus
+        WHERE del_flag is FALSE
+        <if test=" opusName !=null and opusName !='' ">
+            AND opus_name LIKE concat('%',#{opusName},'%')
+        </if>
+        <if test=" memberNick != null and memberNick !='' ">
+            AND member_nick LIKE concat('%',#{memberNick},'%')
+        </if>
+        <if test=" remark !=null and remark !='' ">
+            AND remark LIKE concat('%',#{remark},'%')
+        </if>
+        <if test="opusStatus!=null">
+            AND opus_status = #{opusStatus}
+        </if>
+        <if test="beginDate !=null">
+            <![CDATA[ AND create_date  >=  #{beginDate}  ]]>
+        </if>
+        <if test="endDate !=null "  >
+            <![CDATA[ AND create_date <=  #{endDate}  ]]>
+        </if>
+        ORDER BY create_date DESC
+    </select>
+
+</mapper>

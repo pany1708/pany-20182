@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.BuyersShowMapper">
+    <cache></cache>
+    <resultMap id="BaseResultMap" type="com.kingthy.entity.BuyersShow">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="uuid" property="uuid" jdbcType="CHAR"/>
+        <result column="order_sn" property="orderSn" jdbcType="VARCHAR"/>
+        <result column="order_uuid" property="orderUuid" jdbcType="CHAR"/>
+        <result column="goods_uuid" property="goodsUuid" jdbcType="CHAR"/>
+        <result column="member_name" property="memberName" jdbcType="VARCHAR"/>
+        <result column="member_uuid" property="memberUuid" jdbcType="CHAR"/>
+        <result column="creator" property="creator" jdbcType="VARCHAR"/>
+        <result column="modifier" property="modifier" jdbcType="VARCHAR"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP"/>
+        <result column="del_flag" property="delFlag" jdbcType="BIT"/>
+        <result column="anonymous_flag" property="anonymousFlag" jdbcType="BIT"/>
+        <result column="ip" property="ip" jdbcType="CHAR"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="BIT"/>
+        <result column="content" property="content" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+
+    <resultMap id="BuyerShowListMap" type="com.kingthy.dto.BuyersShowListDTO">
+        <result property="content" column="content"/>
+        <result property="buyersUuid" column="buyersUuid"/>
+        <result property="createDate" column="createDate"/>
+        <result property="memberName" column="memberName"/>
+        <result property="memberUuid" column="memberUuid"/>
+        <result property="icon" column="icon"/>
+        <result property="likeCount" column="likeCount"/>
+        <result property="isLiked" column="isLiked"/>
+        <collection property="images" column="buyersUuid" ofType="java.lang.String" select="selectBuyerShowImageList"/>
+    </resultMap>
+
+
+    <select id="selectBuyersShowList" resultMap="BuyerShowListMap">
+        SELECT
+            a.content,
+            a.uuid buyersUuid,
+            a.member_uuid memberUuid,
+            a.create_date createDate
+        FROM
+          buyers_show a
+        WHERE
+          a.goods_uuid = #{goodsUuid}
+        AND a.del_flag = 0
+        AND a.`status` = 1
+        GROUP BY a.uuid
+        ORDER BY
+          a.create_date DESC
+
+        LIMIT #{pageNo},#{pageSize}
+
+    </select>
+
+    <select id="selectBuyerShowImageList" resultType="java.lang.String">
+        select img_url from buyers_show_img where buyers_uuid=#{uuid}
+    </select>
+
+    <select id="selectBuyersShowByGoodsUuid" parameterType="java.lang.String"
+            resultType="com.kingthy.dto.BuyersShowDTO">
+        SELECT
+              a.content,
+              a.uuid buyersUuid,
+              a.create_date createDate,
+              a.`member_uuid` memberUuid,
+              GROUP_CONCAT(c.img_url) images
+        FROM
+          buyers_show a
+          LEFT JOIN buyers_show_img c
+            ON c.buyers_uuid = a.uuid
+        WHERE a.goods_uuid = #{goodsUuid}
+          AND a.del_flag = 0
+          AND a.`status` = 1
+        GROUP BY a.uuid,a.content,a.create_date,a.member_uuid,c.img_url
+        ORDER BY a.create_date DESC
+        LIMIT 2
+  </select>
+
+    <select id="selectBuyerShowCountByGoodUuid" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT COUNT(1) FROM buyers_show a WHERE a.goods_uuid = #{goodsUuid} AND a.del_flag = 0 AND a.`status` = 1
+    </select>
+
+
+    <select id="selectReviewList" resultType="com.kingthy.dto.BuyersShowReviewDTO"
+            parameterType="com.kingthy.request.BuyersShowReq">
+        select
+        uuid,
+        member_name memberName ,
+        member_uuid memberUuid,
+        order_uuid orderUuid,
+        goods_uuid goodsUuid,
+        create_date createDate,
+        creator,
+        anonymous_flag anonymous,
+        content,
+        status,
+        ip
+        from buyers_show
+        <where>
+            del_flag is FALSE
+            <if test="content != null  and content != ''">
+                and content like concat("%",#{content},"%")
+            </if>
+            <if test="reviewUuid != null and reviewUuid != ''">
+                and uuid = #{reviewUuid}
+            </if>
+            <if test=" uuidList != null and uuidList.size()>0 ">
+                AND goods_uuid in
+                <foreach collection="uuidList" item="uuid" index="" open="(" close=")" separator=",">
+                    #{uuid}
+                </foreach>
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="memberName != null and memberName != ''">
+                AND member_name like concat("%",#{memberName},"%")
+            </if>
+            <if test="beginDate != null and beginDate != ''">
+                AND unix_timestamp(create_date) * 1000 &gt;= #{beginDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND unix_timestamp(create_date) * 1000 &lt; #{endDate}
+            </if>
+        </where>
+        ORDER BY create_date
+    </select>
+
+    <select id="selectReviewList_COUNT" resultType="Long">
+        select
+        count('uuid')
+        from buyers_show
+        <where>
+            del_flag is FALSE
+            <if test="content != null  and content != ''">
+                and content like concat("%",#{content},"%")
+            </if>
+            <if test="reviewUuid != null and reviewUuid != ''">
+                and uuid = #{reviewUuid}
+            </if>
+            <if test=" uuidList != null and uuidList.size()>0 ">
+                AND goods_uuid in
+                <foreach collection="uuidList" item="uuid" index="" open="(" close=")" separator=",">
+                    #{uuid}
+                </foreach>
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="memberName != null and memberName != ''">
+                AND member_name like concat("%",#{memberName},"%")
+            </if>
+            <if test="beginDate != null and beginDate != ''">
+                AND unix_timestamp(create_date) * 1000 &gt;= #{beginDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND unix_timestamp(create_date) * 1000 &lt; #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <select id="findBuyersShowReviewDTOByUuid" parameterType="java.lang.String"
+            resultType="com.kingthy.dto.BuyersShowReviewDTO">
+        select
+        uuid,
+        member_name memberName ,
+        member_uuid memberUuid,
+        order_uuid orderUuid,
+        goods_uuid goodsUuid,
+        create_date createDate,
+        creator,
+        anonymous_flag anonymous,
+        content,
+        status,
+        ip
+        from buyers_show
+        WHERE
+        uuid = #{uuid}
+        AND
+        del_flag is FALSE
+    </select>
+
+    <update id="updateReview" parameterType="map">
+        update buyers_show set modifier = #{modifier},modify_date= CURRENT_TIMESTAMP
+        <choose>
+            <when test="null != status">,status = #{status}</when>
+            <otherwise>,del_flag = #{delFlag}</otherwise>
+        </choose>
+        where `uuid` IN
+        <foreach collection="reviewUuids" item="reviewUuid" separator="," open="(" close=")">
+            #{reviewUuid}
+        </foreach>
+    </update>
+
+
+</mapper>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.MemberFavoriteMapper">
+    <cache></cache>
+    <select id="selectFavoriteCountByGoodsUuidAndMembersUuid" resultType="java.lang.Long"
+            parameterType="java.lang.String">
+        SELECT COUNT(1) FROM member_favorite a WHERE a.favorite_goods_uuid = #{goodsUuid} AND a.favorite_members_uuid = #{membersUuid} AND a.del_flag = 0
+    </select>
+
+    <update id="updateAllFavorite" parameterType="com.kingthy.request.MemberFavoriteReq">
+        UPDATE
+          member_favorite mf
+        SET
+          mf.del_flag = true ,
+          mf.modify_date = #{modifyDate,jdbcType=TIMESTAMP}
+        WHERE mf.favorite_members_uuid = #{memberFavoriteReq.memberUuid}
+    </update>
+
+    <update id="updateSomeFavorite" parameterType="com.kingthy.request.MemberFavoriteReq">
+        UPDATE member_favorite mf
+        SET mf.del_flag = true ,
+        mf.modify_date = #{modifyDate,jdbcType=TIMESTAMP}
+        WHERE mf.favorite_goods_uuid IN
+        <foreach collection="memberFavoriteReq.goodsUuid" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND mf.favorite_members_uuid = #{memberFavoriteReq.memberUuid}
+    </update>
+
+    <!-- 分页查询收藏列表，根据时间戳分页 -->
+    <select id="pageGetFavoriteListByTimesapn" resultType="com.kingthy.entity.MemberFavorite">
+        select uuid,
+        favorite_goods_uuid favoriteMembersUuid,
+        favorite_members_uuid favoriteGoodsUuid,
+        create_date createDate from member_favorite
+        <where>
+            del_flag=0
+            <if test=" memberUuid !=null and memberUuid !='' ">
+                AND favorite_members_uuid=#{memberUuid}
+            </if>
+            <if test=" timespan !=null and timespan >0  ">
+                <![CDATA[  AND (UNIX_TIMESTAMP(create_date)*1000) < #{timespan}  ]]>
+            </if>
+        </where>
+        order by create_date desc
+        LIMIT 0,#{pageSize}
+    </select>
+
+</mapper>

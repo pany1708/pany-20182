@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.MemberIncomeMapper" >
+  <resultMap id="BaseResultMap" type="com.kingthy.entity.MemberIncome" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uuid" property="uuid" jdbcType="CHAR" />
+    <result column="members_uuid" property="membersUuid" jdbcType="CHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+    <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="BIT" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="withdraws" property="withdraws" jdbcType="DECIMAL" />
+    <result column="balance" property="balance" jdbcType="DECIMAL" />
+  </resultMap>
+
+
+
+  <select id="queryBalance" parameterType="java.lang.String" resultType="java.math.BigDecimal">
+      SELECT
+          a.balance
+      FROM
+          member_income a
+      WHERE
+          a.members_uuid = #{membersUuid}
+      AND a.del_flag = 0
+  </select>
+
+  <select id="queryMemberIncomeByMembersUuid" parameterType="java.lang.String" resultMap="BaseResultMap">
+      SELECT * FROM member_income a WHERE a.members_uuid = #{membersUuid} AND a.del_flag = 0
+  </select>
+
+
+  <update id="updateByUuidAndVersion" parameterType="com.kingthy.entity.MemberIncome">
+      update member_income
+      <set >
+          <if test="modifyDate != null" >
+              modify_date = #{modifyDate},
+          </if>
+          <if test="modifier != null" >
+              modifier = #{modifier},
+          </if>
+          <if test="version != null" >
+              version = #{version} + 1,
+          </if>
+
+          <if test="amount != null" >
+              amount = #{amount},
+          </if>
+          <if test="balance != null" >
+              balance = #{balance},
+          </if>
+          <if test="withdraws != null" >
+              withdraws = #{withdraws},
+          </if>
+
+      </set>
+
+      WHERE uuid = #{uuid} AND version = #{version} AND del_flag = 0
+  </update>
+
+</mapper>

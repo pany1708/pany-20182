@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- ~ The MIT License (MIT) ~ ~ Copyright (c) 2014-2016 abel533@gmail.com 
+	~ ~ Permission is hereby granted, free of charge, to any person obtaining 
+	a copy ~ of this software and associated documentation files (the "Software"), 
+	to deal ~ in the Software without restriction, including without limitation 
+	the rights ~ to use, copy, modify, merge, publish, distribute, sublicense, 
+	and/or sell ~ copies of the Software, and to permit persons to whom the Software 
+	is ~ furnished to do so, subject to the following conditions: ~ ~ The above 
+	copyright notice and this permission notice shall be included in ~ all copies 
+	or substantial portions of the Software. ~ ~ THE SOFTWARE IS PROVIDED "AS 
+	IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR ~ IMPLIED, INCLUDING BUT NOT 
+	LIMITED TO THE WARRANTIES OF MERCHANTABILITY, ~ FITNESS FOR A PARTICULAR 
+	PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE ~ AUTHORS OR COPYRIGHT 
+	HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER ~ LIABILITY, WHETHER IN 
+	AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, ~ OUT OF OR IN CONNECTION 
+	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN ~ THE SOFTWARE. -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.CartMapper">
+
+
+	<resultMap id="BaseResultMap" type="com.kingthy.entity.Cart" >
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP" />
+		<result column="version" property="version" jdbcType="INTEGER" />
+		<result column="expire" property="expire" jdbcType="TIMESTAMP" />
+		<result column="member_uuid" property="memberUuid" jdbcType="CHAR" />
+		<result column="del_flag" property="delFlag" jdbcType="BIT" />
+		<result column="uuid" property="uuid" jdbcType="CHAR" />
+		<result column="creator" property="creator" jdbcType="VARCHAR" />
+		<result column="modifier" property="modifier" jdbcType="VARCHAR" />
+	</resultMap>
+
+    <resultMap type="com.kingthy.response.CartResp" id="cartRespMap">
+        <id column="uuid" property="cartItemUuid"/>
+        <result column="uuid" property="cartItemUuid"/>
+        <result column="goods_uuid" property="goodsUuid"/>
+        <result column="quantity" property="quantity" jdbcType="INTEGER"/>
+        <result column="desinger" property="desinger" jdbcType="VARCHAR"/>
+        <result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
+        <result column="goods_feature" property="goodsFeature"
+                jdbcType="VARCHAR"/>
+        <result column="standard_price" property="standardPrice"
+                jdbcType="DECIMAL"/>
+        <result column="goods_image" property="goodsImage" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <!--c.uuid = ci.cart_uuid -->
+    <resultMap type="com.kingthy.entity.Cart" id="cartMap">
+        <id column="uuid" property="uuid"/>
+        <result column="member_uuid" property="memberUuid"/>
+        <collection property="cartItems" ofType="com.kingthy.entity.CartItem">
+            <id column="cart_uuid" property="cartUuid"/>
+            <result column="quantity" property="quantity"/>
+            <result column="goods_uuid" property="goodsUuid"/>
+        </collection>
+    </resultMap>
+
+    <!-- 获取登录用户的购物车数据详情包含产品信息 -->
+    <select id="selectCart" parameterType="String" resultMap="cartRespMap"
+            useCache="true">
+		SELECT
+		ci.uuid AS cartItemUuid,
+		ci.quantity,
+		ci.goods_uuid as goodsUuid
+		/*CASE g.status WHEN
+		0 THEN '已下架' WHEN 1 THEN '已上架'  END AS
+		goodsStatus,
+		g.desinger,
+		g.goods_name,
+		g.goods_feature,
+		g.standard_price,
+		g.goods_image*/
+		FROM
+		cart AS c
+		INNER JOIN cart_item AS ci
+		ON c.uuid =
+		ci.cart_uuid
+		AND ci.del_flag IS FALSE
+	/*	INNER JOIN goods AS g
+		ON
+		ci.goods_uuid = g.uuid*/
+		AND c.member_uuid = #{memberUuid} and c.del_flag = false
+		ORDER BY ci.create_date DESC
+	</select>
+
+    <!-- 合法性校验,防止删除非本人下的数据 -->
+    <select id="checkCartItem" parameterType="String" resultType="java.lang.Integer">
+		SELECT
+		count(ci.uuid)
+		FROM
+		cart AS c
+		INNER JOIN cart_item AS ci
+		ON c.uuid =
+		ci.cart_uuid
+		AND ci.del_flag IS FALSE
+		AND c.member_uuid = #{memberUuid}
+		AND ci.uuid=#{cartItemUuid}
+		ORDER BY ci.create_date DESC
+	</select>
+
+    <update id="deleteCartItemByUuid" parameterType="String">
+		UPDATE cart_item
+		SET
+		del_flag = TRUE
+		WHERE
+		uuid = #{cartItemUuid}
+	</update>
+
+    <select id="selectCartItem" parameterType="String" resultMap="cartMap">
+		SELECT
+		c.uuid ,c.member_uuid ,ci.cart_uuid,ci.quantity,ci.goods_uuid
+		FROM
+		cart AS c
+		, cart_item AS ci
+		WHERE c.uuid = ci.cart_uuid
+		AND ci.del_flag IS FALSE
+		AND c.member_uuid = #{memberUuid} AND c.del_flag IS FALSE
+		ORDER BY ci.create_date DESC
+	</select>
+
+	<select id="selectCartByMemberUuid" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT a.uuid cartUuid FROM cart a WHERE a.member_uuid = #{memberUuid} AND a.del_flag = 0
+		AND EXISTS (SELECT 1 FROM cart_item b WHERE b.del_flag = 0 AND b.cart_uuid = a.uuid)
+	</select>
+
+	<select id="findByPage" parameterType="com.kingthy.entity.Cart" resultMap="BaseResultMap">
+		SELECT id, create_date, modify_date, version, expire, member_uuid, del_flag, uuid, creator,
+		modifier
+		FROM
+		cart
+		WHERE del_flag IS FALSE
+		<if test="uuid != null and uuid != ''">
+			AND uuid LIKE concat('%',#{uuid},'%')
+		</if>
+		<if test="memberUuid != null and memberUuid !='' ">
+			AND member_uuid LIKE concat('%',#{memberUuid},'%')
+		</if>
+		<if test="create_date != null and memberUuid !='' ">
+			AND create_date LIKE concat('%',#{create_date},'%')
+		</if>
+		ORDER BY create_date DESC
+	</select>
+
+	<select id="findByPage_COUNT" resultType="java.lang.Long">
+		SELECT COUNT(uuid)
+		FROM
+		cart
+		WHERE del_flag IS FALSE
+		<if test="uuid != null and uuid != ''">
+			AND uuid LIKE concat('%',#{uuid},'%')
+		</if>
+		<if test="memberUuid != null and memberUuid !='' ">
+			AND member_uuid LIKE concat('%',#{memberUuid},'%')
+		</if>
+		<if test="create_date != null and memberUuid !='' ">
+			AND create_date LIKE concat('%',#{create_date},'%')
+		</if>
+		ORDER BY create_date DESC
+	</select>
+
+
+</mapper>

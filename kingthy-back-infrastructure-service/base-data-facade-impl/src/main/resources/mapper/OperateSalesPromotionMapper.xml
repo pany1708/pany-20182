@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.OperateSalesPromotionMapper" >
+  <resultMap id="BaseResultMap" type="com.kingthy.entity.OperateSalesPromotion" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uuid" property="uuid" jdbcType="CHAR" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+    <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="BIT" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="activity_name" property="activityName" jdbcType="VARCHAR" />
+    <result column="policy_type" property="policyType" jdbcType="INTEGER" />
+    <result column="policy" property="policy" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="join_goods" property="joinGoods" jdbcType="INTEGER" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="findByPage" resultType="com.kingthy.dto.OperateSalesPromotionDto"
+          parameterType="com.kingthy.request.OperateSalesPromotionReq">
+    SELECT op.uuid uuid,op.status status,op.activity_name activityName,op.policy_type policyType,op.policy policy,
+    op.start_time startTime,op.end_time endTime,op.join_goods joinGoods,op.description description FROM
+    operate_sales_promotion op
+    WHERE op.del_flag IS FALSE
+    <if test=" activityName != null and activityName!='' ">
+        AND op.activity_name LIKE concat('%',#{activityName},'%')
+    </if>
+    <if test="joinGoods!=null">
+        AND op.join_goods = #{joinGoods}
+    </if>
+    <if test="description!=null and description!='' " >
+        AND op.description LIKE concat('%',#{description},'%')
+    </if>
+    <if test="status!=null">
+      AND op.status = #{status.value}
+    </if>
+    <if test="startTime !=null">
+      <![CDATA[ AND op.start_time  >=  #{startTime}  ]]>
+    </if>
+    <if test="endTime !=null "  >
+      <![CDATA[ AND op.end_time <=  #{endTime}  ]]>
+    </if>
+    ORDER BY op.create_date
+  </select>
+
+  <select id="findByPage_COUNT" resultType="Long">
+    SELECT COUNT(op.uuid) FROM
+    operate_sales_promotion op
+    WHERE op.del_flag IS FALSE
+    <if test=" activityName != null and activityName!='' ">
+      AND op.activity_name LIKE concat('%',#{activityName},'%')
+    </if>
+    <if test="joinGoods!=null">
+      AND op.join_goods = #{joinGoods}
+    </if>
+    <if test="description!=null and description!='' " >
+      AND op.description LIKE concat('%',#{description},'%')
+    </if>
+    <if test="status!=null">
+      AND op.status = #{status.value}
+    </if>
+    <if test="startTime !=null">
+      <![CDATA[ AND op.start_time  >=  #{startTime}  ]]>
+    </if>
+    <if test="endTime !=null "  >
+      <![CDATA[ AND op.end_time <=  #{endTime}  ]]>
+    </if>
+  </select>
+
+  <select id="selectByUuid" parameterType="java.lang.String" resultType="com.kingthy.entity.OperateSalesPromotion">
+    SELECT op.uuid uuid,op.status status,op.activity_name activityName,op.policy_type policyType,op.policy policy,
+    op.start_time startTime,op.end_time endTime,op.join_goods joinGoods,op.description description,op.version version FROM
+    operate_sales_promotion op
+    WHERE op.del_flag IS FALSE
+    AND uuid = #{uuid}
+  </select>
+</mapper>

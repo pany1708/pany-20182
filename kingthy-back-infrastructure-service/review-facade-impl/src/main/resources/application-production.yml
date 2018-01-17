@@ -1,0 +1,50 @@
+server.port:   ${production.server.port:7800}
+#server:
+#  ssl:
+#    key-store: classpath:keystore.p12
+#    key-store-password: 123456
+#    keyStoreType: PKCS12
+#    keyAlias: tomcat
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${production.spring.datasource.url:jdbc:mysql://192.168.7.193:8066/zmshop_review?characterEncoding=UTF-8 }
+    username: ${production.spring.datasource.username:root}
+    password: ${production.spring.datasource.password:$RFV5tgb}
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      connection-test-query: ${production.spring.datasource.hikari.connection-test-query:select user()}
+      connection-timeout: ${production.spring.datasource.hikari.connection-timeout:30000}
+      idle-timeout: ${production.spring.datasource.hikari.idle-timeout:60000}
+      max-lifetime: ${production.spring.datasource.hikari.max-lifetime:1800000}
+      maximum-pool-size: ${production.spring.datasource.hikari.maximum-pool-size:10}
+      minimum-idle: ${production.spring.datasource.hikari.minimum-idle:10}
+  application:
+    name: ${production.spring.application.name:dubbo-provider-review}
+  redis:
+       database: ${production.spring.redis.database:1}
+       host: ${production.spring.redis.host:192.168.1.225}
+       port: ${production.spring.redis.port:6379}
+       password: ${production.spring.redis.password:myredis}
+       timeout: ${production.spring.redis.timeout:0}
+       pool:
+           max-active: ${production.spring.redis.pool.max-active:20}
+           min-idle: ${production.spring.redis.pool.min-idle:5}
+           max-idle: ${production.spring.redis.pool.max-idle:10}
+           max-wait: ${production.spring.redis.pool.max-wait:-1}
+  rabbitmq:
+      host: ${production.rabbitmq.host:192.168.1.148}
+      port: ${production.rabbitmq.port:5672}
+      username: ${production.rabbitmq.username:admin}
+      password: ${production.rabbitmq.password:Jxkj2016}
+#      dubbo配置
+  dubbo:
+    application.name: review-facade-impl
+    registry.address: ${production.dubbo.registry.address:zookeeper://192.168.7.185:2181}
+    protocol.name: dubbo
+    protocol.port: ${production.dubbo.protocol.port:20889}
+    scan: com.kingthy.dubbo.service.impl
+logging:
+  level:
+    com.kingthy.service.impl: DEBUG      
+     

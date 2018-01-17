@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.mapper.BaseColourInfoMapper" >
+  <cache/>
+  <select id="selectColourCountByCode" parameterType="java.lang.String" resultType="int">
+    SELECT count(1) FROM
+    base_colour_info
+    WHERE
+    code = #{code}
+  </select>
+  </mapper>
