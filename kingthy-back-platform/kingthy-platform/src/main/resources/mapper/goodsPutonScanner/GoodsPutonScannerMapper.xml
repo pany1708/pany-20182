@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.platform.mapper.goodsPutonScanner.GoodsPutonScannerMapper" >
+  <resultMap id="BaseResultMap" type="com.kingthy.platform.entity.goodsPutonScanner.GoodsPutonScanner" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="goods_uuid" property="goodsUuid" jdbcType="VARCHAR" />
+    <result column="goods_put_on_time" property="goodsPutOnTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="uuid" property="uuid" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+    <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="BIT" />
+  </resultMap>
+  
+  <!-- 查找需要处理的记录 -->
+  <select id="findRecordsNeedHandle" resultMap="BaseResultMap">
+  	SELECT uuid,goods_uuid FROM goods_puton_scanner g
+	WHERE 
+		del_flag is false	
+	AND
+		status=0
+	AND 
+	goods_put_on_time &lt; NOW()
+  </select>
+  
+  <!-- 批量更新上架状态 -->
+  <update id="updateStatusBatch" parameterType="java.util.Map">
+  	update goods_puton_scanner g set
+  		g.status= #{status},
+  		g.modify_date = #{modifyDate},
+  		g.modifier = #{modifier}
+  		where g.uuid in
+  		<foreach collection="goodsPutonScannerList" item="goodsPutonScanner" index="" open="(" close=")" separator=",">
+				#{goodsPutonScanner.uuid}
+		</foreach>
+  </update>
+  
+  <!-- 批量删除 -->
+  <delete id="deleteBatch" parameterType="java.util.Map">
+  	delete from goods_puton_scanner where goods_uuid in
+  	<foreach collection="uuidArray" item="goodsUuid" index="" open="(" close=")" separator=",">
+				#{goodsUuid}
+	</foreach>
+  </delete>
+  
+  <!-- 批量更改delFlag -->
+  <update id="changeDelFlagBatch" parameterType="java.util.Map">
+  	update goods_puton_scanner g set
+  		g.del_flag=#{delFlag},
+  		g.modify_date = #{modifyDate},
+  		g.modifier = #{modifier}
+  		where g.goods_uuid in
+  	<foreach collection="uuidArray" item="goodsUuid" index="" open="(" close=")" separator=",">
+				#{goodsUuid}
+	</foreach>
+  </update>
+  
+  <delete id="deleteByGoodsUuid" parameterType="java.lang.String">
+  	delete from goods_puton_scanner where goods_uuid = #{goodsUuid};
+  </delete>
+  
+</mapper>

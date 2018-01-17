@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.platform.mapper.order.OrdersMapper">
+    <resultMap id="BaseResultMap" type="com.kingthy.platform.entity.order.Orders">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP"/>
+        <result column="payment_date" property="paymentDate" jdbcType="TIMESTAMP"/>
+        <result column="delivery_date" property="deliveryDate" jdbcType="TIMESTAMP"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="amount" property="amount" jdbcType="DECIMAL"/>
+        <result column="area_name" property="areaName" jdbcType="VARCHAR"/>
+        <result column="complete_date" property="completeDate" jdbcType="TIMESTAMP"/>
+        <result column="consignee" property="consignee" jdbcType="VARCHAR"/>
+        <result column="coupon_discount" property="couponDiscount" jdbcType="DECIMAL"/>
+        <result column="exchange_point" property="exchangePoint" jdbcType="INTEGER"/>
+        <result column="expire" property="expire" jdbcType="TIMESTAMP"/>
+        <result column="fee" property="fee" jdbcType="DECIMAL"/>
+        <result column="freight" property="freight" jdbcType="DECIMAL"/>
+        <result column="is_invoice" property="isInvoice" jdbcType="BIT"/>
+        <result column="invoice_content" property="invoiceContent" jdbcType="VARCHAR"/>
+        <result column="invoice_title" property="invoiceTitle" jdbcType="VARCHAR"/>
+        <result column="is_exchange_point" property="isExchangePoint" jdbcType="BIT"/>
+        <result column="is_use_coupon_code" property="isUseCouponCode" jdbcType="BIT"/>
+        <result column="memo" property="memo" jdbcType="VARCHAR"/>
+        <result column="offset_amount" property="offsetAmount" jdbcType="DECIMAL"/>
+        <result column="payment_method_type" property="paymentMethodType" jdbcType="INTEGER"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="quantity" property="quantity" jdbcType="INTEGER"/>
+        <result column="refund_amount" property="refundAmount" jdbcType="DECIMAL"/>
+        <result column="returned_quantity" property="returnedQuantity" jdbcType="INTEGER"/>
+        <result column="shipped_quantity" property="shippedQuantity" jdbcType="INTEGER"/>
+        <result column="shipping_method_name" property="shippingMethodName" jdbcType="VARCHAR"/>
+        <result column="shipping_number" property="shippingNumber" jdbcType="VARCHAR"/>
+        <result column="sn" property="sn" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="tax" property="tax" jdbcType="DECIMAL"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="zip_code" property="zipCode" jdbcType="VARCHAR"/>
+        <result column="area_uuid" property="areaUuid" jdbcType="INTEGER"/>
+        <result column="coupon_uuid" property="couponUuid" jdbcType="CHAR"/>
+        <result column="member_name" property="memberName" jdbcType="VARCHAR"/>
+        <result column="member_uuid" property="memberUuid" jdbcType="CHAR"/>
+        <result column="payment_method_uuid" property="paymentMethodUuid" jdbcType="CHAR"/>
+        <result column="shipping_method_uuid" property="shippingMethodUuid" jdbcType="CHAR"/>
+        <result column="del_flag" property="delFlag" jdbcType="BIT"/>
+        <result column="uuid" property="uuid" jdbcType="CHAR"/>
+        <result column="figure_uuid" property="figureUuid" jdbcType="CHAR"/>
+        <result column="province_uuid" property="provinceUuid" jdbcType="CHAR"/>
+        <result column="province_name" property="provinceName" jdbcType="VARCHAR"/>
+        <result column="city_uuid" property="cityUuid" jdbcType="CHAR"/>
+        <result column="city_name" property="cityName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="OrderInfoResultMap" type="com.kingthy.platform.entity.order.dto.OrderInfoDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP"/>
+        <result column="payment_date" property="paymentDate" jdbcType="TIMESTAMP"/>
+        <result column="delivery_date" property="deliveryDate" jdbcType="TIMESTAMP"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="amount" property="amount" jdbcType="DECIMAL"/>
+        <result column="area_name" property="areaName" jdbcType="VARCHAR"/>
+        <result column="complete_date" property="completeDate" jdbcType="TIMESTAMP"/>
+        <result column="consignee" property="consignee" jdbcType="VARCHAR"/>
+        <result column="coupon_discount" property="couponDiscount" jdbcType="DECIMAL"/>
+        <result column="exchange_point" property="exchangePoint" jdbcType="INTEGER"/>
+        <result column="expire" property="expire" jdbcType="TIMESTAMP"/>
+        <result column="fee" property="fee" jdbcType="DECIMAL"/>
+        <result column="freight" property="freight" jdbcType="DECIMAL"/>
+        <result column="is_invoice" property="isInvoice" jdbcType="BIT"/>
+        <result column="invoice_content" property="invoiceContent" jdbcType="VARCHAR"/>
+        <result column="invoice_title" property="invoiceTitle" jdbcType="VARCHAR"/>
+        <result column="is_exchange_point" property="isExchangePoint" jdbcType="BIT"/>
+        <result column="is_use_coupon_code" property="isUseCouponCode" jdbcType="BIT"/>
+        <result column="memo" property="memo" jdbcType="VARCHAR"/>
+        <result column="offset_amount" property="offsetAmount" jdbcType="DECIMAL"/>
+        <result column="payment_method_type" property="paymentMethodType" jdbcType="INTEGER"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="quantity" property="quantity" jdbcType="INTEGER"/>
+        <result column="refund_amount" property="refundAmount" jdbcType="DECIMAL"/>
+        <result column="returned_quantity" property="returnedQuantity" jdbcType="INTEGER"/>
+        <result column="shipped_quantity" property="shippedQuantity" jdbcType="INTEGER"/>
+        <result column="shipping_method_name" property="shippingMethodName" jdbcType="VARCHAR"/>
+        <result column="shipping_number" property="shippingNumber" jdbcType="VARCHAR"/>
+        <result column="sn" property="sn" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="tax" property="tax" jdbcType="DECIMAL"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="zip_code" property="zipCode" jdbcType="VARCHAR"/>
+        <result column="area_uuid" property="areaUuid" jdbcType="INTEGER"/>
+        <result column="coupon_uuid" property="couponUuid" jdbcType="CHAR"/>
+        <result column="member_name" property="memberName" jdbcType="VARCHAR"/>
+        <result column="member_uuid" property="memberUuid" jdbcType="CHAR"/>
+        <result column="payment_method_uuid" property="paymentMethodUuid" jdbcType="CHAR"/>
+        <result column="shipping_method_uuid" property="shippingMethodUuid" jdbcType="CHAR"/>
+        <result column="del_flag" property="delFlag" jdbcType="BIT"/>
+        <result column="uuid" property="uuid" jdbcType="CHAR"/>
+        <result column="figure_uuid" property="figureUuid" jdbcType="CHAR"/>
+        <result column="province_uuid" property="provinceUuid" jdbcType="CHAR"/>
+        <result column="province_name" property="provinceName" jdbcType="VARCHAR"/>
+        <result column="city_uuid" property="cityUuid" jdbcType="CHAR"/>
+        <result column="city_name" property="cityName" jdbcType="VARCHAR"/>
+        <collection property="orderItems" ofType="com.kingthy.platform.entity.order.OrderItem">
+            <result column="oicreate_date" property="createDate" jdbcType="TIMESTAMP"/>
+            <result column="oimodify_date" property="modifyDate" jdbcType="TIMESTAMP"/>
+            <result column="version" property="version" jdbcType="BIGINT"/>
+            <result column="is_delivery" property="isDelivery" jdbcType="BIT"/>
+            <result column="name" property="name" jdbcType="VARCHAR"/>
+            <result column="oi_price" property="price" jdbcType="DECIMAL"/>
+            <result column="oi_quantity" property="quantity" jdbcType="INTEGER"/>
+            <result column="sn" property="sn" jdbcType="VARCHAR"/>
+            <result column="thumbnail" property="thumbnail" jdbcType="VARCHAR"/>
+            <result column="type" property="type" jdbcType="INTEGER"/>
+            <result column="order_uuid" property="orderUuid" jdbcType="CHAR"/>
+            <result column="product_uuid" property="productUuid" jdbcType="CHAR"/>
+            <result column="del_flag" property="delFlag" jdbcType="BIT"/>
+            <result column="uuid" property="uuid" jdbcType="CHAR"/>
+            <result column="oicreator" property="creator" jdbcType="VARCHAR"/>
+            <result column="oimodifier" property="modifier" jdbcType="VARCHAR"/>
+        </collection>
+        <collection property="orderLogs" ofType="com.kingthy.platform.entity.order.OrderLog">
+            <result column="olcreate_date" property="createDate" jdbcType="TIMESTAMP"/>
+            <result column="olmodify_date" property="modifyDate" jdbcType="TIMESTAMP"/>
+            <result column="version" property="version" jdbcType="INTEGER"/>
+            <result column="content" property="content" jdbcType="VARCHAR"/>
+            <result column="remark" property="remark" jdbcType="VARCHAR"/>
+            <result column="operator" property="operator" jdbcType="VARCHAR"/>
+            <result column="logtype" property="type" jdbcType="INTEGER"/>
+            <result column="order_uuid" property="orderUuid" jdbcType="CHAR"/>
+            <result column="del_flag" property="delFlag" jdbcType="BIT"/>
+            <result column="uuid" property="uuid" jdbcType="CHAR"/>
+            <result column="olcreator" property="creator" jdbcType="VARCHAR"/>
+            <result column="olmodifier" property="modifier" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, create_date, modify_date, version, address, amount, area_name, complete_date, 
+    consignee, coupon_discount, exchange_point, expire, fee, freight, invoice_content, 
+    invoice_title, is_exchange_point, is_use_coupon_code, memo, offset_amount, payment_method_type, 
+    phone, price, quantity, refund_amount, returned_quantity, shipped_quantity, shipping_method_name, 
+    shipping_number, sn, status, tax, type, zip_code, area_uuid, coupon_uuid, member_uuid, 
+    payment_method_uuid, shipping_method_uuid, del_flag, uuid, figure_uuid, province_uuid, province_name, city_uuid, city_name
+  </sql>
+
+    <!-- <select id="selectOrderInfo" resultMap="OrderInfoResultMap" >
+        select
+           o.* ,oi.* ,ol.*
+        from orders o , order_item oi , order_log ol
+        where o.uuid = oi.order_uuid and o.uuid =ol.order_uuid and o.uuid=#{uuid} and o.del_flag= false
+      </select>-->
+
+    <select id="selectOrderInfo" resultMap="OrderInfoResultMap">
+  select
+  o.*,oi.* ,oi.price oi_price, oi.quantity oi_quantity,ol.* , ol.type logType,oi.creator as oicreator,
+  oi.create_date as oicreate_date, oi.modifier as oimodifier, oi.modify_date as oimodify_date,
+   ol.creator as olcreator, ol.create_date as olcreate_date, ol.modifier as olmodifier, ol.modify_date as olmodify_date
+  FROM orders o LEFT JOIN
+  order_item oi on o.uuid = oi.order_uuid
+  LEFT JOIN
+  order_log ol on o.uuid = ol.order_uuid
+  WHERE
+  o.uuid = #{uuid}
+  </select>
+
+    <select id="selectShippingList" parameterType="com.kingthy.platform.dto.order.ShippingReq" resultType="com.kingthy.platform.dto.order.ShippingDto">
+        SELECT
+            a.sn,
+            a.create_date orderCreateDate,
+            a.payment_date paymentDate,
+            a.`name` goodsName,
+            a.price,
+            a.quantity,
+            a.amount,
+            b.freight,
+            a.member_name,
+            b.address,
+            a.memo,
+            a.is_invoice isInvoice,
+            a.`status`
+        FROM
+            order_item a
+        LEFT JOIN orders b ON a.order_uuid = b.uuid
+        WHERE
+            a.del_flag = 0
+        AND a.`status` &gt; 0
+        AND a.`status` &lt; 4
+
+        <if test="desingerName != null and desingerName != ''">
+        AND EXISTS (
+            SELECT
+              1
+            FROM
+              goods b,
+              member c
+            WHERE
+              b.del_flag = 0
+            AND b.desinger = c.uuid
+            AND c.user_name LIKE concat('%',#{desingerName},'%')
+            AND a.product_uuid = b.uuid
+        )
+        </if>
+
+
+        <if test="memberName != null and memberName != ''">
+            AND a.member_name LIKE concat('%',#{memberName},'%')
+        </if>
+
+        <if test="status != null and status != ''">
+            AND a.`status` = #{status}
+        </if>
+
+        <if test="beginTime != null and beginTime != ''">
+            AND unix_timestamp(a.create_date) * 1000 &gt;= #{beginTime}
+        </if>
+
+        <if test="endTime != null and endTime != ''">
+            AND unix_timestamp(a.create_date) * 1000 &lt; #{endTime}
+        </if>
+
+        <if test="priceMin != null">
+            AND a.amount &gt;= #{priceMin}
+        </if>
+
+        <if test="priceMax != null">
+            AND a.amount &lt;= #{priceMax}
+        </if>
+        <if test="sn != null and sn != ''">
+            AND a.sn = #{sn}
+        </if>
+    </select>
+
+    <update id="deliveryOrders" parameterType="com.kingthy.platform.dto.order.ShippingReq$DeliveryReq">
+        UPDATE order_item a SET a.`status` = #{status}, a.modifier = #{memberUuid},
+        <if test="shippingNumber != null and shippingNumber != ''">
+            shipping_number = #{shippingNumber}, a.delivery_date = NOW(),
+        </if>
+         a.modify_date = NOW() WHERE a.sn = #{orderSn} AND a.del_flag = 0
+    </update>
+
+    <update id="updateOrdersAddress" parameterType="com.kingthy.platform.dto.order.ShippingReq$EditAddress">
+        UPDATE orders a SET a.address = #{address}, a.modifier = #{modifier}, a.modify_date = NOW() WHERE a.uuid = #{ordersUuid} AND a.del_flag = 0
+    </update>
+
+    <select id="showOrderShippingBySn" parameterType="java.lang.String" resultType="com.kingthy.platform.dto.order.ShippingReq$OrderShipping">
+        SELECT
+            a.sn orderSn,
+            a.create_date createDate,
+            a.`name` goodsName,
+            a.quantity,
+            c.figure_name figureName,
+            a.amount,
+            a.shipping_method_name shippingMethodName,
+            a.memo,
+            a.invoice_title invoiceTitle,
+            b.address,
+            b.area_name areaName,
+            b.consignee,
+            b.phone,
+            b.zip_code zipCode
+        FROM
+            order_item a
+        LEFT JOIN orders b ON a.order_uuid = b.uuid
+        LEFT JOIN figure c ON a.figure_uuid = c.uuid
+        WHERE
+            a.del_flag = 0 AND a.sn = #{orderSn}
+
+    </select>
+
+    <!-- <select id="selectOrderInfo" resultMap="OrderInfoResultMap" >
+    select
+      <if test="distinct" >
+        distinct
+      </if>
+      <include refid="Base_Column_List" />
+      from orders
+      <if test="_parameter != null" >
+        <include refid="Example_Where_Clause" />
+      </if>
+      <if test="orderByClause != null" >
+        order by ${orderByClause}
+      </if>
+    </select> -->
+</mapper>

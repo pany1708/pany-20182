@@ -1,0 +1,72 @@
+server.port:  7081
+#server:
+#  ssl:
+#    key-store: classpath:keystore.p12
+#    key-store-password: 123456
+#    keyStoreType: PKCS12
+#    keyAlias: tomcat
+spring:
+  thymeleaf:
+    prefix: classpath:/webcontent/
+    suffix: .html
+  datasource: 
+    type: com.zaxxer.hikari.HikariDataSource
+    #${dev.spring.datasource.url}
+    url: jdbc:mysql://192.168.7.193:8066/zmshop?characterEncoding=UTF-8
+    #
+    username: ${dev.spring.datasource.username:root}
+    #${dev.spring.datasource.password}
+    password: ${dev.spring.datasource.password:root}
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari: 
+      connection-test-query: ${dev.spring.datasource.hikari.connection-test-query:select user()}
+      #${dev.spring.datasource.hikari.connection-timeout:30000}
+      connection-timeout: ${dev.spring.datasource.hikari.connection-timeout:30000}
+      #${dev.spring.datasource.hikari.idle-timeout}
+      idle-timeout: ${dev.spring.datasource.hikari.idle-timeout:60000}
+      max-lifetime: ${dev.spring.datasource.hikari.max-lifetime:1800000}
+      maximum-pool-size: ${dev.spring.datasource.hikari.maximum-pool-size:10}
+      minimum-idle: ${dev.spring.datasource.hikari.minimum-idle:10}
+  application:
+    name: kingthy-platform
+#  activemq:
+#    broker-url: ${dev.spring.activemq.broker-url:tcp://192.168.1.191:61616}
+  rabbitmq:
+    host: ${dev.spring.rabbitmq.host:localhost}
+    username: ${dev.spring.rabbitmq.username:guest}
+    password: ${dev.spring.rabbitmq.password:guest}
+  redis:
+    database: ${dev.spring.redis.database:0}
+    host: ${dev.spring.redis.host:192.168.7.193}
+    port: ${dev.spring.redis.port:6379}
+    password: ${dev.spring.redis.password:}
+    timeout: ${dev.spring.redis.timeout:0}
+    pool:
+      max-active: ${dev.spring.redis.pool.max-active:20}
+      min-idle: ${dev.spring.redis.pool.min-idle:5}
+      max-idle: ${dev.spring.redis.pool.max-idle:10}
+      max-wait: ${dev.spring.redis.pool.max-wait:-1}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:7081/eureka/
+  instance:
+    lease-renewal-interval-in-seconds: ${dev.eureka.instance.lease-renewal-interval-in-seconds:2}
+    lease-expiration-duration-in-seconds: ${dev.eureka.instance.lease-expiration-duration-in-seconds:2}
+hystrix:
+      command.default.execution.isolation.thread.timeoutInMilliseconds: ${dev.command.default.execution.isolation.thread.timeoutInMilliseconds:5000}
+logging:
+  level:
+    com.kingthy.platform.service.impl: DEBUG
+    com.kingthy.platform.mapper: DEBUG
+upstream:
+     baseUrl: ${dev.upstream.baseUrl:http://192.168.7.193:8080/ab_admin?action=}
+     policy_check: ${dev.upstream.policy_check:policy_check}
+     policy_set: ${dev.upstream.policy_set:policy_set}
+     policy_get: ${dev.upstream.policy_get:policy_get}
+     policy_del: ${dev.upstream.policy_del:policy_del}
+     runtime_get: ${dev.upstream.runtime_get:runtime_get}
+     runtime_set: ${dev.upstream.runtime_set:runtime_set}
+     runtime_del: ${dev.upstream.runtime_del:runtime_del}
+     hostname: ${dev.upstream.hostname:kingthy.cn}

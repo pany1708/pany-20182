@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kingthy.platform.mapper.opus.OpusMaterialMapper">
+  <resultMap id="BaseResultMap" type="com.kingthy.platform.entity.opus.OpusMaterial">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="opus_uuid" jdbcType="CHAR" property="opusUuid" />
+    <result column="material_uuid" jdbcType="CHAR" property="materialUuid" />
+  </resultMap>
+</mapper>

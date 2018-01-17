@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kingthy.platform.mapper.opus.OpusMapper">
+  <resultMap id="BaseResultMap" type="com.kingthy.platform.entity.opus.Opus">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+    <result column="modify_date" jdbcType="TIMESTAMP" property="modifyDate" />
+    <result column="modifier" jdbcType="VARCHAR" property="modifier" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+    <result column="opus_name" jdbcType="VARCHAR" property="opusName" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="sn" jdbcType="VARCHAR" property="sn" />
+    <result column="opus_image" jdbcType="LONGVARCHAR" property="opusImage" />
+    <result column="opus_details" jdbcType="VARCHAR" property="opusDetails" />
+    <result column="modle_path" jdbcType="VARCHAR" property="modlePath" />
+    <result column="opus_status" jdbcType="INTEGER" property="opusStatus" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="is_show" jdbcType="BIT" property="isShow" />
+    <result column="del_flag" jdbcType="BIT" property="delFlag" />
+    <result column="uuid" jdbcType="CHAR" property="uuid" />
+    <result column="opus_style_uuid" jdbcType="CHAR" property="opusStyleUuid" />
+    <result column="opus_season_uuid" jdbcType="CHAR" property="opusSeasonUuid" />
+    <result column="member_uuid" jdbcType="CHAR" property="memberUuid" />
+    <result column="opus_category_uuid" jdbcType="CHAR" property="opusCategoryUuid" />
+  </resultMap>
+  <resultMap id="OpusDtoMap" extends="BaseResultMap" type="com.kingthy.platform.dto.opus.OpusDto">
+  	<result column="opus_category_name" jdbcType="VARCHAR" property="opusCategoryName" />
+  	<result column="opus_style_name" jdbcType="VARCHAR" property="opusStyleName" />
+    <result column="opus_season_name" jdbcType="VARCHAR" property="opusSeasonName" />
+    <result column="user_name" jdbcType="VARCHAR" property="designer" />
+  </resultMap>
+  
+  <insert id="addOpusRelations" parameterType="map">
+    insert into ${tableName} (opus_uuid, 
+    <choose>
+    	<when test="tableName=='opus_material'">material_uuid</when>
+    	<when test="tableName=='opus_accessories'">accessories_uuid</when>
+    	<when test="tableName=='opus_tag'">tags_uuid</when>
+    	<when test="tableName=='opus_part'">part_sub_uuid</when>
+    </choose>
+    ) values 
+    <foreach collection="opusRelationsReq.relationUuids" item="relationUuid" separator=",">
+    	(#{opusRelationsReq.opusUuid,jdbcType=VARCHAR},#{relationUuid,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  <delete id="deleteOpusRelations" parameterType="map">
+    delete from ${tableName} where  
+    opus_uuid = #{opusRelationsReq.opusUuid,jdbcType=VARCHAR} and 
+    <choose>
+    	<when test="tableName=='opus_material'">material_uuid</when>
+    	<when test="tableName=='opus_accessories'">accessories_uuid</when>
+    	<when test="tableName=='opus_tag'">tags_uuid</when>
+    	<when test="tableName=='opus_part'">part_sub_uuid</when>
+    </choose>
+    in
+    <foreach collection="opusRelationsReq.relationUuids" item="relationUuid" separator="," open="(" close=")">
+    	#{relationUuid,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  <select id="findOpusTag" parameterType="java.lang.String" resultType="com.kingthy.platform.dto.opus.OpusRelationsDto">
+  	select uuid,class_name as name from tag_category where uuid in ( select tags_uuid from opus_tag where opus_uuid = #{opusUuid,jdbcType=VARCHAR})
+  </select>
+  <select id="findOpusPart" parameterType="java.lang.String" resultType="String">
+  	select part_sub_uuid from opus_part where opus_uuid = #{opusUuid,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByOpusDto" parameterType="com.kingthy.platform.dto.opus.OpusDto" resultMap="OpusDtoMap">
+  	select op.uuid,  opus_name,  opus_category_uuid,  cc.`class_name` AS opus_category_name,  opus_style_uuid,  sc.`class_name` AS opus_style_name,
+  op.`opus_season_uuid`,  sec.`class_name` AS opus_season_name,  member_uuid,  me.`user_name` AS user_name,  op.create_date,  is_show,  opus_image,
+  sn,  remark,  opus_details,  modle_path  from opus op
+  	 LEFT JOIN class_category cc 
+	    ON op.`opus_category_uuid` = cc.`uuid` 
+	  LEFT JOIN style_category sc 
+	    ON op.`opus_style_uuid` = sc.`uuid` 
+	  LEFT JOIN season_category sec 
+	    ON op.`opus_season_uuid` = sec.`uuid` 
+	  LEFT JOIN member me 
+	    ON op.`member_uuid` = me.`uuid` 
+  	<trim prefix="where" prefixOverrides="and" >
+  		 and op.del_flag is false
+  		<if test="opusName != null and opusName != ''"> and opus_name like concat('%',#{opusName},'%')</if>
+  		<if test="opusCategoryUuid != null and opusCategoryUuid != ''"> and opus_category_uuid = #{opusCategoryUuid}</if>
+  		<if test="opusStyleUuid != null and opusStyleUuid != ''"> and opus_style_uuid = #{opusStyleUuid}</if>
+  		<if test="opusSeasonUuid != null and opusSeasonUuid != ''"> and opus_season_uuid = #{opusSeasonUuid}</if>
+  		<if test="isShow != null "> and is_show = #{isShow}</if>
+  		<if test="beginDate != null "> and op.create_date <![CDATA[>=]]> #{beginDate}</if>
+  		<if test="endDate != null "> and op.create_date <![CDATA[<=]]> #{endDate}</if>
+  		<if test="designer != null and designer != ''"> and member_uuid in (select uuid from member where user_name like concat('%',#{designer},'%'))</if>
+        <if test="opusStatus != null and opusStatus != '' ">AND op.opus_status = #{opusStatus}</if>
+        order by op.create_date desc
+  	</trim>
+  </select>
+  <select id="findOpusRelations" parameterType="map" resultType="com.kingthy.platform.dto.opus.OpusRelationsDto">
+  	select uuid,name,image from ${tableName} where uuid in (select 
+	<choose>
+		<when test="tableName=='material'">material_uuid</when>
+		<when test="tableName=='accessories'">accessories_uuid</when>
+		<otherwise>technics_uuid</otherwise>
+	</choose>
+		from 
+	<choose>
+		<when test="tableName=='material'">opus_material</when>
+		<when test="tableName=='accessories'">opus_accessories</when>
+		<otherwise>opus_technics</otherwise>
+	</choose>where opus_uuid = #{opusUuid})
+  </select>
+  <update id="updateOpusIsShow" parameterType="map">
+  	update opus set is_show = #{isShow},modifier=#{modifier},modify_date=CURRENT_TIMESTAMP where uuid in 
+  	<foreach collection="opusUuids" item="uuid" separator="," open="(" close=")">
+  		#{uuid}
+  	</foreach>
+  </update>
+</mapper>

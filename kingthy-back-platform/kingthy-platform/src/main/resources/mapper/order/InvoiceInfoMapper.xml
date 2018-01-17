@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.platform.mapper.order.InvoiceInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.kingthy.platform.entity.order.InvoiceInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uuid" property="uuid" jdbcType="CHAR" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+    <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="BIT" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="invoice_type" property="invoiceType" jdbcType="INTEGER" />
+    <result column="invoice_title" property="invoiceTitle" jdbcType="VARCHAR" />
+    <result column="order_sn" property="orderSn" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="findInvoicePage" parameterType="com.kingthy.platform.dto.order.InvoiceInfoReq" resultType="com.kingthy.platform.dto.order.InvoiceInfoDto">
+    SELECT
+        a.order_sn orderSn,
+        a.creator memberUuid,
+        b.phone,
+        a.invoice_no invoiceNo,
+        a.invoice_title invoiceTitle,
+        c.amount,
+        a.invoice_type invoiceType,
+        c.payment_date paymentDate,
+        a.billing_time billingTime,
+        a.`status`
+    FROM
+        invoice_info a
+    LEFT JOIN member b ON a.creator = b.uuid
+    LEFT JOIN order_item c ON a.order_sn = c.sn
+    WHERE
+        a.del_flag = 0
+
+      <if test="uuid != null and uuid != ''">
+        AND a.uuid = #{uuid}
+      </if>
+
+      <if test="status != null">
+         AND a.`status` = #{status}
+      </if>
+
+      <if test="orderSn != null and orderSn != ''">
+        AND a.order_sn = #{orderSn}
+
+      </if>
+
+      <if test="invoiceNo != null and invoiceNo != ''">
+          AND a.invoice_no = #{invoiceNo}
+      </if>
+
+      <if test="phone != null and phone != ''">
+           AND  b.phone = #{phone}
+      </if>
+
+      <if test="invoiceTitle != null and invoiceTitle != ''">
+          AND a.invoice_title = #{invoiceTitle}
+
+      </if>
+
+      <if test="invoiceType != null and invoiceType != ''">
+          AND a.invoice_type = #{invoiceType}
+
+      </if>
+
+      <if test="amountMin != null">
+          AND c.amount &gt;= #{amountMin}
+      </if>
+
+      <if test="amountMax != null">
+          AND c.amount &lt;= #{amountMax}
+      </if>
+
+      <if test="billingTimeBegin != null ">
+
+          AND unix_timestamp(a.billing_time) * 1000 &gt;= #{billingTimeBegin}
+      </if>
+
+      <if test="billingTimeEnd != null ">
+
+          AND unix_timestamp(a.billing_time) * 1000 &lt; #{billingTimeEnd}
+      </if>
+
+  </select>
+
+</mapper>

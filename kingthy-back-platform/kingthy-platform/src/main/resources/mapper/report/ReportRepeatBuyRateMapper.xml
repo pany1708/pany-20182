@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kingthy.platform.mapper.report.ReportRepeatBuyRateMapper" >
+  <resultMap id="BaseResultMap" type="com.kingthy.platform.entity.report.ReportRepeatBuyRate" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uuid" property="uuid" jdbcType="CHAR" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+    <result column="modifier" property="modifier" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="modify_date" property="modifyDate" jdbcType="TIMESTAMP" />
+    <result column="del_flag" property="delFlag" jdbcType="BIT" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="rate" property="rate" jdbcType="DECIMAL" />
+  </resultMap>
+
+  <select id="repeatBuyRateReport" resultType="com.kingthy.platform.dto.report.RepeatBuyRateReportDto">
+    SELECT rate,create_date AS refreshTime FROM report_repeat_buy_rate
+  </select>
+
+  <delete id="deleteAll" >
+    DELETE from report_repeat_buy_rate;
+  </delete>
+</mapper>
