@@ -1,2 +1,0 @@
-2017-09-05 20:23:47.859 INFO [main]com.kingthy.service.test.OrderServiceTest.logStartupProfileInfo():665 -The following profiles are active: dev
-2017-09-05 20:24:02.535 INFO [main]com.kingthy.service.test.OrderServiceTest.logStarted():57 -Started OrderServiceTest in 17.755 seconds (JVM running for 18.985)

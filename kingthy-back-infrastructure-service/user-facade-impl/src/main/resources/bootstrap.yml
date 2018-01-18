@@ -1,8 +1,0 @@
-spring:
-  cloud:
-    config:
-      name: user-facade
-      uri: http://conf.api.com:8000
-      
-  #profiles:
-    #active: dev
