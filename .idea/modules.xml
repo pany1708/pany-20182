@@ -60,6 +60,7 @@
       <module fileurl="file://$PROJECT_DIR$/../../dubbo/dubbo-dubbo-2.5.3/dubbo-test/dubbo-test-examples/dubbo-test-examples.iml" filepath="$PROJECT_DIR$/../../dubbo/dubbo-dubbo-2.5.3/dubbo-test/dubbo-test-examples/dubbo-test-examples.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../dubbo/dubbo-dubbo-2.5.3/dubbo-test/dubbo-test-integration/dubbo-test-integration.iml" filepath="$PROJECT_DIR$/../../dubbo/dubbo-dubbo-2.5.3/dubbo-test/dubbo-test-integration/dubbo-test-integration.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/pany-20182.iml" filepath="$PROJECT_DIR$/.idea/pany-20182.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../dubbo/spring-boot-starter-dubbo-master/spring-boot-starter-dubbo.iml" filepath="$PROJECT_DIR$/../../dubbo/spring-boot-starter-dubbo-master/spring-boot-starter-dubbo.iml" />
     </modules>
   </component>
 </project>

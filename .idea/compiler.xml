@@ -52,6 +52,7 @@
         <module name="dubbo-test-compatibility" />
         <module name="dubbo-test-examples" />
         <module name="dubbo-test-integration" />
+        <module name="spring-boot-starter-dubbo" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -112,6 +113,10 @@
       <module name="dubbo-test-compatibility" target="1.5" />
       <module name="dubbo-test-examples" target="1.5" />
       <module name="dubbo-test-integration" target="1.5" />
+      <module name="spring-boot-starter-dubbo" target="1.8" />
+      <module name="vertx-api-test" target="1.8" />
+      <module name="vertx-core" target="1.8" />
+      <module name="vertx-framework" target="1.6" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -9,6 +9,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/../../dubbo/dubbo-dubbo-2.5.3/pom.xml" />
+        <option value="$PROJECT_DIR$/../../dubbo/spring-boot-starter-dubbo-master/pom.xml" />
       </list>
     </option>
   </component>
